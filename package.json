@@ -1,0 +1,44 @@
+{
+  "name": "puchitto",
+  "version": "1.0.0",
+  "description": "A framework for building interactive multiplayer 3D websites.",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "clean": "shx rm -rf dist",
+    "build": "npm run clean && tsc",
+    "prepublishOnly": "npm run build"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/purifetchi/puchitto.git"
+  },
+  "keywords": [],
+  "author": "prefetcher",
+  "license": "MIT",
+  "type": "module",
+  "bugs": {
+    "url": "https://github.com/purifetchi/puchitto/issues"
+  },
+  "homepage": "https://github.com/purifetchi/puchitto#readme",
+  "devDependencies": {
+    "@types/three": "^0.183.1",
+    "shx": "^0.4.0",
+    "three": "^0.183.2",
+    "typescript": "^5.9.3"
+  },
+  "peerDependencies": {
+    "three": ">=0.183.2"
+  }
+}

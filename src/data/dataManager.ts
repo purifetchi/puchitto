@@ -52,7 +52,7 @@ export default class DataManager {
         if (lump === undefined) {
             throw new Error(`[EntityFactory::getStringLumpData] Lump ${path} wasn't found.`)
         }
-        
+
         const data = this._currentPackage.read(lump)
         const decoder = new TextDecoder('utf-8')
         const stringData = decoder.decode(data)

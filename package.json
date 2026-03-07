@@ -8,6 +8,18 @@
     ".": {
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js"
+    },
+    "./networking": {
+      "types": "./dist/networking/index.d.ts",
+      "import": "./dist/networking/index.js"
+    },
+    "./scripting": {
+      "types": "./dist/scripting/index.d.ts",
+      "import": "./dist/scripting/index.js"
+    },
+    "./components": {
+      "types": "./dist/components/index.d.ts",
+      "import": "./dist/components/index.js"
     }
   },
   "files": [

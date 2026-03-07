@@ -1,6 +1,6 @@
 {
   "name": "puchitto",
-  "version": "1.0.0",
+  "version": "0.1.0",
   "description": "A framework for building interactive multiplayer 3D websites.",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -36,9 +36,11 @@
     "@types/three": "^0.183.1",
     "shx": "^0.4.0",
     "three": "^0.183.2",
-    "typescript": "^5.9.3"
+    "typescript": "^5.9.3",
+    "@mary/events": "npm:@jsr/mary__events@^0.2.0"
   },
   "peerDependencies": {
-    "three": ">=0.183.2"
+    "three": ">=0.183.2",
+    "@mary/events": "npm:@jsr/mary__events@^0.2.0"
   }
 }

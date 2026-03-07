@@ -1,3 +1,5 @@
+import { NetworkReader } from "../../networkReader";
+import { PuchittoPacket } from "../puchittoPacket";
 import { InternalPacketTypes } from "./internalPacketTypes";
 
 /**

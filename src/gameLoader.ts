@@ -37,7 +37,7 @@ export class GameLoader {
     async load() {
         this._game.eventStream.emit("loading", 0)
 
-        const jsonString = this._game._dataManager.getStringLumpData("/levelon")
+        const jsonString = this._game._dataManager.getStringLumpData("/level.json")
         const level = JSON.parse(jsonString) as Level
 
         this._loadLevel(level)

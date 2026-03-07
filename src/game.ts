@@ -1,28 +1,28 @@
 import * as THREE from 'three';
 import * as events from "@mary/events";
-import type GameObject from './objects/gameObject.js';
-import CameraObject from './objects/cameraObject.js';
-import Input from './input.js';
-import type TweenContract from './tweening/tweenContract.js';
-import { zeroTransform } from './level/transform.js';
-import MiniAnticsEnvironment from './scripting/miniAnticsEnvironment.js';
-import NetworkManager from './networking/networkManager.js';
-import { InternalPacketTypes } from './networking/packets/internal/internalPacketTypes.js';
-import { readHelloPacket } from './networking/packets/internal/helloPacket.js';
-import { writeJoinPacket, type JoinPacket } from './networking/packets/internal/joinPacket.js';
-import { readLoadPacket } from './networking/packets/internal/loadPacket.js';
-import GameLoader from './gameLoader.js';
-import { writeLoadStatePacket, type LoadStatePacket } from './networking/packets/internal/loadStatePacket.js';
-import { LoadState } from './networking/packets/internal/loadState/loadState.js';
-import { readCreateEntityPacket } from './networking/packets/internal/createEntityPacket.js';
-import EntityFactory from './level/entityFactory.js';
-import DataManager from './data/dataManager.js';
-import { readRemoveEntityPacket } from './networking/packets/internal/removeEntityPacket.js';
+import { zeroTransform } from './level/transform';
+import { InternalPacketTypes } from './networking/packets/internal/internalPacketTypes';
+import { readHelloPacket } from './networking/packets/internal/helloPacket';
+import { writeJoinPacket, type JoinPacket } from './networking/packets/internal/joinPacket';
+import { readLoadPacket } from './networking/packets/internal/loadPacket';
+import { writeLoadStatePacket, type LoadStatePacket } from './networking/packets/internal/loadStatePacket';
+import { LoadState } from './networking/packets/internal/loadState/loadState';
+import { readCreateEntityPacket } from './networking/packets/internal/createEntityPacket';
+import { readRemoveEntityPacket } from './networking/packets/internal/removeEntityPacket';
+import { CameraObject } from './objects/cameraObject';
+import { GameObject } from './objects/gameObject';
+import { TweenContract } from './tweening/tweenContract';
+import { Input } from './input';
+import { EntityFactory } from './level/entityFactory';
+import { DataManager } from './data/dataManager';
+import { NetworkManager } from './networking';
+import { MiniAnticsEnvironment } from './scripting';
+import { GameLoader } from '.';
 
 /**
- * The main class for the game. 
+ * The main class for the game.
  */
-export default abstract class Game {
+export abstract class Game {
     /**
      * This game's scene.
      */
@@ -119,7 +119,7 @@ export default abstract class Game {
     }
 
     /**
-     * Sets up THREE.JS
+     * Sets up THREE
      */
     _setupThree() : void {
         this._scene = new THREE.Scene()
@@ -129,7 +129,7 @@ export default abstract class Game {
             height: window.innerHeight,
             transform: zeroTransform()
         })
-        
+
         this._renderer = new THREE.WebGLRenderer({ antialias: true })
         this._renderer.setClearColor(0x000000, 0)
         this._clock = new THREE.Clock(true);
@@ -164,7 +164,7 @@ export default abstract class Game {
             url: url,
             game: this
         })
-        
+
         this._addDefaultPacketHandlers()
         this._networkManager.start()
     }
@@ -302,7 +302,7 @@ export default abstract class Game {
      */
     private _makeBaseEnvironment() : MiniAnticsEnvironment {
         const environment = new MiniAnticsEnvironment()
-        
+
         environment.set("+", (a: any, b: any) => a + b)
         environment.set("-", (a: any, b: any) => a - b)
         environment.set("*", (a: any, b: any) => a * b)
@@ -345,7 +345,7 @@ export default abstract class Game {
 
         this.registerCustomEventStreamHandlers()
     }
-    
+
     /**
      * Called when the game wants to register custom packet handlers.
      */
@@ -395,7 +395,7 @@ export default abstract class Game {
                 console.error(`[Network::removeEntity] Got told to remove non-existant entity ${packet.id}`)
                 return
             }
-            
+
             this.removeObject(object)
         })
 
@@ -440,7 +440,7 @@ export default abstract class Game {
 
         this._stepTweens(dt)
         this._handleClickableEntities()
-        
+
         this._renderer.render(this._scene, this._camera.camera)
         this._input.reset()
     }

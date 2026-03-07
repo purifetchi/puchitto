@@ -1,10 +1,10 @@
-import type Entity from "./levelEntityDefinition.js";
-import type LightData from "./lightData.js";
+import { LevelEntityDefinition } from "./levelEntityDefinition";
+import { LightData } from "./lightData";
 
 /**
  * The definition for a level.
  */
-export default interface Level {
+export interface Level {
     ambient: LightData,
-    ents: Entity[]
+    ents: LevelEntityDefinition[]
 }

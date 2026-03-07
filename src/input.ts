@@ -3,7 +3,7 @@ import { Vector2 } from "three";
 /**
  * The class responsible for handling input.
  */
-export default class Input {
+export class Input {
     /**
      * The position of the pointer.
      */

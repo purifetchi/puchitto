@@ -1,4 +1,4 @@
-import type PuchittoPacket from "../puchittoPacket.js";
+import { PuchittoPacket } from "../puchittoPacket";
 
 /**
  * The join packet.

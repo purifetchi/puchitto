@@ -1,1 +1,1 @@
-export * from './animatorComponent.js'
+export * from './animatorComponent'

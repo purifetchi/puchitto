@@ -1,6 +1,6 @@
-import type NetworkReader from "../../networkReader.js";
-import type PuchittoPacket from "../puchittoPacket.js";
-import { InternalPacketTypes } from "./internalPacketTypes.js";
+import { NetworkReader } from "../../networkReader";
+import { PuchittoPacket } from "../puchittoPacket";
+import { InternalPacketTypes } from "./internalPacketTypes";
 
 /**
  * The entity removal packet sent from the server.

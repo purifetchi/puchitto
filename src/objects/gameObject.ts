@@ -1,16 +1,15 @@
 import type { Object3D } from "three"
-import type GameObjectOptions from "./gameObjectOptions.js"
-import type Game from "../game.js"
 import { EventEmitter } from "@mary/events"
-import MiniAnticsEnvironment from "../scripting/miniAnticsEnvironment.js"
-import type { AnticsDefinition, AnticsOn } from "./anticsDefinition.js"
-import type ObjectAntics from "./objectAntics.js"
-import MiniAnticsScript from "../scripting/miniAnticsScript.js"
+import type { AnticsDefinition, AnticsOn } from "./anticsDefinition"
+import { Game } from "../game"
+import { MiniAnticsEnvironment, MiniAnticsScript } from "../scripting"
+import { ObjectAntics } from "./objectAntics"
+import { GameObjectOptions } from "./gameObjectOptions"
 
 /**
  * The base game object.
  */
-export default class GameObject<TEntityData> {
+export class GameObject<TEntityData> {
     /**
      * The ID of this game object.
      */
@@ -22,12 +21,12 @@ export default class GameObject<TEntityData> {
     tag?: string | undefined
 
     /**
-     * The underlying THREE.JS object.
+     * The underlying THREE object.
      */
     threeObject! : Object3D
 
     /**
-     * 
+     *
      */
     game! : Game
 
@@ -76,7 +75,7 @@ export default class GameObject<TEntityData> {
         this.id = opts?.id!
         this.tag = opts?.tag
         this.hasAuthority = opts?.hasAuthority ?? false
-        
+
         this._objectAntics = this._parseAntics(opts?.antics)
 
         console.log(`[GameObject::constructor] Constructed object with id ${this.id} and authority ${this.hasAuthority}`)
@@ -131,7 +130,7 @@ export default class GameObject<TEntityData> {
     }
 
     /**
-     * Attaches this object to the THREE.JS scene.
+     * Attaches this object to the THREE scene.
      */
     protected _attach() : void {
         this.attached = true
@@ -151,7 +150,7 @@ export default class GameObject<TEntityData> {
         this.game = game
         this._setupMiniAntics()
     }
-    
+
     /**
      * Called when the object gets added to the scene.
      */

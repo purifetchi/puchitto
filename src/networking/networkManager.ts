@@ -1,14 +1,14 @@
-import type Game from "../game.js";
-import type NetworkReader from "./networkReader.js";
-import NetworkWriter from "./networkWriter.js";
-import PacketProcessor, { type PacketHandler } from "./packets/packetProcessor.js";
-import type PuchittoPacket from "./packets/puchittoPacket.js";
-import WebSocketListener from "./webSocketListener.js";
+import { Game } from "../game"
+import { NetworkReader } from "./networkReader"
+import { NetworkWriter } from "./networkWriter"
+import { PacketHandler, PacketProcessor } from "./packets/packetProcessor"
+import { PuchittoPacket } from "./packets/puchittoPacket"
+import { WebSocketListener } from "./webSocketListener"
 
 /**
  * The class managing all network related things in Puchitto.
  */
-export default class NetworkManager {
+export class NetworkManager {
     /**
      * The packet processor.
      */
@@ -74,12 +74,12 @@ export default class NetworkManager {
     send<T extends PuchittoPacket>(packet: T, serializer: (pkt: T, nw: NetworkWriter) => void) {
         // TODO: Pool NetworkWriters
         const nw = new NetworkWriter()
-        
+
         const seq = Atomics.add(this._seq, 0, 1)
         const opCode = packet.type
         nw.writeInt32(seq)
         nw.writeInt32(opCode)
-        
+
         const lengthPos = nw.position
         nw.writeInt32(0)
 

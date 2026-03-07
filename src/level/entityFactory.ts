@@ -1,12 +1,12 @@
-import type Game from "../game.js";
-import type { CreateEntityPacket } from "../networking/packets/internal/createEntityPacket.js";
-import type { AnticsDefinition } from "../objects/anticsDefinition.js";
-import type GameObject from "../objects/gameObject.js";
-import type GameObjectOptions from "../objects/gameObjectOptions.js";
-import { LightObject } from "../objects/lightObject.js";
-import ModelObject from "../objects/modelObject.js";
-import type LevelEntityDefinition from "./levelEntityDefinition.js";
-import { jsonTransformToRegularTransform, type Transform } from "./transform.js";
+import { Game } from "../game";
+import type { CreateEntityPacket } from "../networking/packets/internal/createEntityPacket";
+import type { AnticsDefinition } from "../objects/anticsDefinition";
+import { GameObject } from "../objects/gameObject";
+import { GameObjectOptions } from "../objects/gameObjectOptions";
+import { LightObject } from "../objects/lightObject";
+import { ModelObject } from "../objects/modelObject";
+import { LevelEntityDefinition } from "./levelEntityDefinition";
+import { jsonTransformToRegularTransform, type Transform } from "./transform";
 
 /**
  * Extracts the data type of the game object.
@@ -25,7 +25,7 @@ interface EntityDefintionForCreation {
     id?: string,
     tag?: string,
     antics?: AnticsDefinition[],
-    hasAuthority?: boolean 
+    hasAuthority?: boolean
     transform: Transform,
     data: any
 }
@@ -33,7 +33,7 @@ interface EntityDefintionForCreation {
 /**
  * The entity factory responsible for creating entities.
  */
-export default class EntityFactory {
+export class EntityFactory {
     /**
      * The currently active game.
      */
@@ -45,7 +45,7 @@ export default class EntityFactory {
     private _factoryMap : Record<string, (ent: EntityDefintionForCreation) => GameObject<unknown>> = {
         "model": (ent: EntityDefintionForCreation) => this._constructFromEntityType<ModelObject>(ModelObject, ent),
         "light": (ent: EntityDefintionForCreation) => this._constructFromEntityType<LightObject>(LightObject, ent)
-    } 
+    }
 
     /**
      * Constructs a new entity factory.
@@ -72,7 +72,7 @@ export default class EntityFactory {
         const createFn = this._factoryMap[ent.type]
         if (createFn === undefined) {
             console.error(`[EntityFactory::createFromLevelDefinition] Could not find create function for entity type ${ent.type}.`)
-            return 
+            return
         }
 
         return createFn({
@@ -92,7 +92,7 @@ export default class EntityFactory {
         const createFn = this._factoryMap[packet.entityName]
         if (createFn === undefined) {
             console.error(`[EntityFactory::createFromLevelDefinition] Could not find create function for entity type ${packet.entityName}.`)
-            return 
+            return
         }
 
         return createFn({
@@ -106,7 +106,7 @@ export default class EntityFactory {
             data: JSON.parse(packet.jsonEntityData)
         })
     }
-    
+
     /**
      * Constructs an entity given its type, constructor and entity data.
      * @param ctor The constructor of the entity.
@@ -131,5 +131,5 @@ export default class EntityFactory {
         this._game.addObject(obj)
 
         return obj
-    } 
+    }
 }

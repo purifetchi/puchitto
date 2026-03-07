@@ -1,10 +1,10 @@
-import AlfMount from "./alf/alfMount.js"
-import AlfPackage from "./alf/alfPackage.js"
+import { AlfMount } from "./alf/alfMount"
+import { AlfPackage } from "./alf/alfPackage"
 
 /**
  * The manager for currently loaded data.
  */
-export default class DataManager {
+export class DataManager {
     /**
      * The current package.
      */
@@ -59,4 +59,4 @@ export default class DataManager {
 
         return stringData
     }
-} 
+}

@@ -3,7 +3,7 @@ import { Quaternion, Vector3 } from "three"
 /**
  * A utility to read structured data from an ArrayBuffer.
  */
-export default class NetworkReader {
+export class NetworkReader {
     /**
      * The DataView providing access to the buffer.
      */
@@ -45,7 +45,7 @@ export default class NetworkReader {
     }
 
     /**
-     * Reads a 32-bit floating point value. 
+     * Reads a 32-bit floating point value.
      */
     readFloat(): number {
         const value = this._view.getFloat32(this._offset, true)
@@ -95,14 +95,14 @@ export default class NetworkReader {
      */
     readString(): string {
         const length = this.readInt32()
-        
+
         // Create a view of the specific string bytes
         const stringBytes = new Uint8Array(
-            this._view.buffer, 
-            this._view.byteOffset + this._offset, 
+            this._view.buffer,
+            this._view.byteOffset + this._offset,
             length
         )
-        
+
         this._offset += length
         return this._decoder.decode(stringBytes)
     }

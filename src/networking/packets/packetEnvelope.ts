@@ -1,4 +1,4 @@
-import type NetworkReader from "../networkReader.js"
+import { NetworkReader } from "../networkReader"
 
 /**
  * The header for Puchitto packets.
@@ -28,7 +28,7 @@ export const readEnvelope = (nr: NetworkReader) : PacketEnvelope => {
     const seq = nr.readInt32()
     const opCode = nr.readInt32()
     const length = nr.readInt32()
-    
+
     return {
         seq: seq,
         opCode: opCode,

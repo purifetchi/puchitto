@@ -1,6 +1,6 @@
-import type NetworkWriter from "../../networkWriter.js";
-import type PuchittoPacket from "../puchittoPacket.js";
-import type { LoadState } from "./loadState/loadState.js";
+import { NetworkWriter } from "../../networkWriter";
+import { PuchittoPacket } from "../puchittoPacket";
+import type { LoadState } from "./loadState/loadState";
 
 /**
  * The load update state packet sent to the server.

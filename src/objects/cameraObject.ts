@@ -1,16 +1,16 @@
-import { OrthographicCamera, PerspectiveCamera, Vector3 } from "three";
-import GameObject from "./gameObject.js";
-import type GameObjectOptions from "./gameObjectOptions.js";
-import type CameraEntityData from "../level/entities/cameraEntityData.js";
+import { OrthographicCamera, Vector3 } from "three";
+import { GameObject } from "./gameObject";
+import { CameraEntityData } from "../level/entities/cameraEntityData";
+import { GameObjectOptions } from "./gameObjectOptions";
 
-export default class CameraObject extends GameObject<CameraEntityData> {
+export class CameraObject extends GameObject<CameraEntityData> {
     /**
      * The zoom level.
      */
     private _zoom = 6
-    
+
     /**
-     * The THREE.JS camera.
+     * The THREE camera.
      */
     private _camera : OrthographicCamera
 
@@ -40,7 +40,7 @@ export default class CameraObject extends GameObject<CameraEntityData> {
     }
 
     /**
-     * Gets the THREE.JS camera.
+     * Gets the THREE camera.
      */
     get camera() {
         return this._camera

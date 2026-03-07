@@ -1,7 +1,7 @@
 /**
  * The camera entity data.
  */
-export default interface CameraEntityData {
+export interface CameraEntityData {
     width: number,
     height: number
 }

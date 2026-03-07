@@ -1,9 +1,9 @@
-import NetworkReader from "./networkReader.js"
+import { NetworkReader } from "./networkReader"
 
 /**
  * The WebSocket listener part of the framework.
  */
-export default class WebSocketListener {
+export class WebSocketListener {
     /**
      * Executed when we have incoming data.
      */

@@ -1,8 +1,8 @@
 import type { LoadingManager } from "three";
-import { type Transform } from "../level/transform.js";
-import type { AnticsDefinition } from "./anticsDefinition.js";
+import { type Transform } from "../level/transform";
+import type { AnticsDefinition } from "./anticsDefinition";
 
-export default interface GameObjectOptions {
+export interface GameObjectOptions {
     id? : string | undefined,
     tag? : string | undefined,
     hasAuthority? : boolean | undefined,

@@ -1,6 +1,6 @@
 import type { AnimationAction, AnimationClip, AnimationMixer } from "three";
 
-export default class AnimatorComponent {
+export class AnimatorComponent {
     /**
      * The main animation mixer.
      */

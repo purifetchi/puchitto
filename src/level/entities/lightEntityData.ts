@@ -1,4 +1,4 @@
-export default interface LightEntityData {
+export interface LightEntityData {
     color: number[],
     intensity: number,
     range: number,

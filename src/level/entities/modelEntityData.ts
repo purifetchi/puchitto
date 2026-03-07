@@ -1,7 +1,7 @@
 /**
  * The model entity data.
  */
-export default interface ModelEntityData {
+export interface ModelEntityData {
     path: string,
     transparent: boolean,
     clamp: boolean

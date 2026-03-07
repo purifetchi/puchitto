@@ -1,7 +1,7 @@
 /**
  * The default contract for a tween.
  */
-export default interface TweenContract {
+export interface TweenContract {
     /**
      * Steps a tween.
      * @param dt The delta time.

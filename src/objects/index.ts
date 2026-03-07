@@ -1,0 +1,6 @@
+export * from './gameObject'
+export * from './gameObjectOptions'
+export * from './cameraObject'
+export * from './modelObject'
+export * from './lightObject'
+export * from './objectAntics'

@@ -1,10 +1,10 @@
-import type { AnticsDefinition } from "../objects/anticsDefinition.js";
-import type JsonTransform from "./jsonTransform.js";
+import type { AnticsDefinition } from "../objects/anticsDefinition";
+import { JsonTransform } from "./jsonTransform";
 
 /**
  * A single entity
  */
-export default interface LevelEntityDefinition {
+export interface LevelEntityDefinition {
     id?: string | undefined,
     tag?: string | undefined,
     antics?: AnticsDefinition[] | undefined,

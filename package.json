@@ -1,58 +1,59 @@
 {
-  "name": "puchitto",
-  "version": "0.1.0",
-  "description": "A framework for building interactive multiplayer 3D websites.",
-  "main": "./dist/index.js",
-  "types": "./dist/index.d.ts",
-  "exports": {
-    ".": {
-      "types": "./dist/index.d.ts",
-      "import": "./dist/index.js"
+    "name": "puchitto",
+    "version": "0.1.0",
+    "type": "module",
+    "main": "./dist/index.js",
+    "types": "./dist/index.d.ts",
+    "exports": {
+        ".": {
+            "types": "./dist/index.d.ts",
+            "import": "./dist/index.js"
+        },
+        "./networking": {
+            "types": "./dist/networking.d.ts",
+            "import": "./dist/networking.js"
+        },
+        "./scripting": {
+            "types": "./dist/scripting.d.ts",
+            "import": "./dist/scripting.js"
+        },
+        "./components": {
+            "types": "./dist/components.d.ts",
+            "import": "./dist/components.js"
+        },
+        "./tweening": {
+            "types": "./dist/tweening.d.ts",
+            "import": "./dist/tweening.js"
+        },
+        "./level": {
+            "types": "./dist/level.d.ts",
+            "import": "./dist/level.js"
+        },
+        "./objects": {
+            "types": "./dist/objects.d.ts",
+            "import": "./dist/objects.js"
+        },
+        "./data": {
+            "types": "./dist/data.d.ts",
+            "import": "./dist/data.js"
+        },
+        "./alf": {
+            "types": "./dist/alf.d.ts",
+            "import": "./dist/alf.js"
+        }
     },
-    "./networking": {
-      "types": "./dist/networking/index.d.ts",
-      "import": "./dist/networking/index.js"
+    "scripts": {
+        "dev": "tsup --watch",
+        "build": "tsup",
+        "prepublishOnly": "npm run build"
     },
-    "./scripting": {
-      "types": "./dist/scripting/index.d.ts",
-      "import": "./dist/scripting/index.js"
+    "devDependencies": {
+        "@types/three": "^0.183.1",
+        "three": "^0.183.2",
+        "tsup": "^8.5.1"
     },
-    "./components": {
-      "types": "./dist/components/index.d.ts",
-      "import": "./dist/components/index.js"
+    "peerDependencies": {
+        "@mary/events": "npm:@jsr/mary__events@^0.2.0",
+        "three": ">=0.183.2"
     }
-  },
-  "files": [
-    "dist",
-    "README.md",
-    "LICENSE"
-  ],
-  "scripts": {
-    "clean": "shx rm -rf dist",
-    "build": "npm run clean && tsc",
-    "prepublishOnly": "npm run build"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/purifetchi/puchitto.git"
-  },
-  "keywords": [],
-  "author": "prefetcher",
-  "license": "MIT",
-  "type": "module",
-  "bugs": {
-    "url": "https://github.com/purifetchi/puchitto/issues"
-  },
-  "homepage": "https://github.com/purifetchi/puchitto#readme",
-  "devDependencies": {
-    "@types/three": "^0.183.1",
-    "shx": "^0.4.0",
-    "three": "^0.183.2",
-    "typescript": "^5.9.3",
-    "@mary/events": "npm:@jsr/mary__events@^0.2.0"
-  },
-  "peerDependencies": {
-    "three": ">=0.183.2",
-    "@mary/events": "npm:@jsr/mary__events@^0.2.0"
-  }
 }

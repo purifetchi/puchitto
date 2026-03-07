@@ -1,6 +1,6 @@
-import type NetworkReader from "../../networkReader.js"
-import type PuchittoPacket from "../puchittoPacket.js"
-import { InternalPacketTypes } from "./internalPacketTypes.js"
+import { NetworkReader } from "../../networkReader"
+import { PuchittoPacket } from "../puchittoPacket"
+import { InternalPacketTypes } from "./internalPacketTypes"
 
 /**
  * The hello packet originating from the server.
@@ -17,7 +17,7 @@ export interface HelloPacket extends PuchittoPacket {
 export const readHelloPacket = (nr: NetworkReader) : HelloPacket => {
     const branding = nr.readString()
     const gameRules = nr.readString()
-    
+
     return {
         type: InternalPacketTypes.HELLO,
         branding: branding,

@@ -1,7 +1,7 @@
 /**
  * The light data.
  */
-export default interface LightData {
+export interface LightData {
     color: number[],
     intensity: number
 }

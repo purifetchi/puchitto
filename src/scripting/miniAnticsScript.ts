@@ -1,11 +1,11 @@
-import type MiniAnticsEnvironment from "./miniAnticsEnvironment.js";
-import { parse, type Expression } from "./parser.js";
-import { tokenize } from "./tokenizer.js";
+import { MiniAnticsEnvironment } from "./miniAnticsEnvironment";
+import { parse, type Expression } from "./parser";
+import { tokenize } from "./tokenizer";
 
 /**
  * A MiniAntics script.
  */
-export default class MiniAnticsScript {
+export class MiniAnticsScript {
     /**
      * The expression.
      */

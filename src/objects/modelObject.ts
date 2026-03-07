@@ -1,10 +1,10 @@
 import { MTLLoader, OBJLoader } from "three/examples/jsm/Addons.js";
-import GameObject from "./gameObject.js";
-import type GameObjectOptions from "./gameObjectOptions.js";
 import { ClampToEdgeWrapping, Mesh, MeshToonMaterial } from "three";
-import type ModelEntityData from "../level/entities/modelEntityData.js";
+import { GameObject } from "./gameObject";
+import { ModelEntityData } from "../level/entities/modelEntityData";
+import { GameObjectOptions } from "./gameObjectOptions";
 
-export default class ModelObject extends GameObject<ModelEntityData> {
+export class ModelObject extends GameObject<ModelEntityData> {
     constructor(opts: GameObjectOptions & ModelEntityData) {
         super(opts)
 
@@ -13,7 +13,7 @@ export default class ModelObject extends GameObject<ModelEntityData> {
         const mtlLoader = new MTLLoader(opts.loader)
         mtlLoader.load(path.replace(".obj", ".mtl"), data => {
             objLoader.setMaterials(data)
-        
+
             objLoader.load(path, data => {
                 data.scale.set(transform.scale.x, transform.scale.y, transform.scale.z)
                 data.position.set(transform.position.x, transform.position.y, transform.position.z)
@@ -30,7 +30,7 @@ export default class ModelObject extends GameObject<ModelEntityData> {
                             color: oldMaterial.color || null
                         });
                         toonMaterial.transparent = opts.transparent
-                        
+
                         if (toonMaterial.map !== null && opts.clamp) {
                             toonMaterial.map.wrapS = ClampToEdgeWrapping
                             toonMaterial.map.wrapT = ClampToEdgeWrapping

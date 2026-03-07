@@ -1,15 +1,15 @@
-import type Game from "../game.js";
-import type TweenContract from "./tweenContract.js";
+import { Game } from "../game"
+import { TweenContract } from "./tweenContract"
 
 /**
  * A tween.
  */
-export default class Tween<T> implements TweenContract {
+export class Tween<T> implements TweenContract {
     /**
      * The duration, in seconds, of the tween.
      */
     private _duration: number
-    
+
     /**
      * The current value.
      */
@@ -122,7 +122,7 @@ export default class Tween<T> implements TweenContract {
         if (this._acc >= 1) {
             this._acc = 1
         }
-        
+
         this._value = this._interpolator(
             this._startValue,
             this._endValue,

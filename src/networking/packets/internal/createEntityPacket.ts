@@ -1,7 +1,7 @@
 import type { Quaternion, Vector3 } from "three";
-import type PuchittoPacket from "../puchittoPacket.js";
-import type NetworkReader from "../../networkReader.js";
-import { InternalPacketTypes } from "./internalPacketTypes.js";
+import { InternalPacketTypes } from "./internalPacketTypes";
+import { PuchittoPacket } from "../puchittoPacket";
+import { NetworkReader } from "../../networkReader";
 
 /**
  * Sent from the server whenever it wants to create a new entity.
@@ -37,7 +37,7 @@ export const readCreateEntityPacket = (nr: NetworkReader): CreateEntityPacket =>
         entityName,
         position,
         rotation,
-        scale, 
+        scale,
         isOwner,
         jsonEntityData
     }

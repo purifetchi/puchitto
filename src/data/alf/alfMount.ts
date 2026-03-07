@@ -1,12 +1,12 @@
 import * as THREE from 'three';
-import type AlfPackage from "./alfPackage.js";
+import { AlfPackage } from './alfPackage';
 
 /**
  * The ALF mounting manager, that allows for loading assets from ALF files.
  */
-export default class AlfMount {
+export class AlfMount {
     /**
-     * The loading manager for THREE.js.
+     * The loading manager for THREE.
      */
     public manager: THREE.LoadingManager;
 
@@ -31,7 +31,7 @@ export default class AlfMount {
      */
     private _resolveURL(url: string): string {
         let relativePath = url;
-        
+
         // TODO: what
         if (relativePath.startsWith(".")) {
             relativePath = relativePath.substring(1)
@@ -59,7 +59,7 @@ export default class AlfMount {
         try {
             const urlObj = new URL(url, window.location.href);
             if (urlObj.origin === window.location.origin) {
-                relativePath = urlObj.pathname.substring(1); 
+                relativePath = urlObj.pathname.substring(1);
             }
         } catch (e) {
 
@@ -82,7 +82,7 @@ export default class AlfMount {
         const ext = filename.split('.').pop()?.toLowerCase();
         switch(ext) {
             case 'png': return 'image/png';
-            case 'jpg': 
+            case 'jpg':
             case 'jpeg': return 'image/jpeg';
             case 'obj': return 'text/plain';
             case 'mtl': return 'text/plain';

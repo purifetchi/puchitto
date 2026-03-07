@@ -3,12 +3,12 @@ import type { Quaternion, Vector3 } from "three"
 /**
  * A utility to write structured data into an ArrayBuffer.
  */
-export default class NetworkWriter {
+export class NetworkWriter {
     private _buffer: ArrayBuffer
     private _view: Uint8Array
     private _dataView: DataView
     private _offset: number
-    
+
     private static readonly _encoder = new TextEncoder()
 
     /**
@@ -114,9 +114,9 @@ export default class NetworkWriter {
      */
     writeString(value: string): void {
         const encodedString = NetworkWriter._encoder.encode(value)
-        
+
         this.writeInt32(encodedString.length)
-        
+
         this._view.set(encodedString, this._offset)
         this._offset += encodedString.length
     }

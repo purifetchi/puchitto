@@ -1,2 +1,2 @@
-export * from './miniAnticsEnvironment.js'
-export * from './miniAnticsScript.js'
+export * from './miniAnticsEnvironment'
+export * from './miniAnticsScript'

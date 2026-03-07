@@ -1,6 +1,4 @@
-import type NetworkReader from "../../networkReader.js";
-import type PuchittoPacket from "../puchittoPacket.js";
-import { InternalPacketTypes } from "./internalPacketTypes.js";
+import { InternalPacketTypes } from "./internalPacketTypes";
 
 /**
  * The load packet sent to us from the server.

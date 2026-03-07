@@ -1,10 +1,10 @@
-import type MiniAnticsScript from "../scripting/miniAnticsScript.js";
-import type { AnticsOn } from "./anticsDefinition.js";
+import { MiniAnticsScript } from "../scripting";
+import type { AnticsOn } from "./anticsDefinition";
 
 /**
  * The antics for an object.
  */
-export default interface ObjectAntics {
+export interface ObjectAntics {
     /**
      * When to perform the antics script.
      */

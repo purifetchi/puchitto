@@ -1,3 +1,3 @@
-export * from './game.js'
-export * from './gameLoader.js'
-export * from './input.js'
+export * from './game'
+export * from './gameLoader'
+export * from './input'

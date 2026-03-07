@@ -1,10 +1,10 @@
-import type { AlfHeader } from "./alfHeader.js";
-import { AlfLump } from "./alfLump.js";
+import type { AlfHeader } from "./alfHeader";
+import { AlfLump } from "./alfLump";
 
 /**
  * An ALF package file handler.
  */
-export default class AlfPackage {
+export class AlfPackage {
     private buffer: ArrayBuffer | null;
     private view: DataView | null;
     private textDecoder = new TextDecoder("utf-8");
@@ -13,14 +13,14 @@ export default class AlfPackage {
     public header: AlfHeader | null = null;
     public lumps: AlfLump[] = [];
     public path: string;
-    
+
     private lumpMap: Map<string, AlfLump> = new Map();
 
     constructor(data: ArrayBufferLike, path: string = "") {
-        this.buffer = data instanceof ArrayBuffer 
-            ? data 
+        this.buffer = data instanceof ArrayBuffer
+            ? data
             : (new Uint8Array(data).buffer as unknown as ArrayBuffer);
-            
+
         this.view = new DataView(this.buffer);
         this.path = path;
         this.parseHeader();
@@ -31,16 +31,16 @@ export default class AlfPackage {
         if (!response.ok) {
             throw new Error(`Failed to fetch ALF: ${response.statusText}`);
         }
-        
+
         const arrayBuffer = await response.arrayBuffer();
         return new AlfPackage(arrayBuffer, url);
     }
 
     private parseHeader(): void {
-        if (!this.view) { 
+        if (!this.view) {
             throw new Error("Object disposed");
         }
-        
+
         this.offset = 0;
 
         const h1 = String.fromCharCode(this.view.getUint8(this.offset++));
@@ -79,7 +79,7 @@ export default class AlfPackage {
     }
 
     public getLump(path: string): AlfLump | undefined {
-        if (this.lumpMap.has(path)) { 
+        if (this.lumpMap.has(path)) {
             return this.lumpMap.get(path);
         }
 
@@ -96,21 +96,21 @@ export default class AlfPackage {
      * Safely reads the bytes for a specific lump.
      */
     public read(lump: AlfLump): Uint8Array {
-        const buf = this.buffer; 
-        
+        const buf = this.buffer;
+
         if (!buf || !this.view) {
             throw new Error("Object disposed");
         }
-        
+
         const offset = Number(lump.pointer);
         const slice = buf.slice(offset, offset + lump.size) as ArrayBuffer;
-        
+
         return new Uint8Array(slice);
     }
 
     private read7BitEncodedString(): string {
         const buf = this.buffer;
-        if (!this.view || !buf) { 
+        if (!this.view || !buf) {
             return "";
         }
 

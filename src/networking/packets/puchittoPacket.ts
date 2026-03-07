@@ -1,7 +1,7 @@
 /**
- * A Puchitto packet. 
+ * A Puchitto packet.
  */
-export default interface PuchittoPacket {
+export interface PuchittoPacket {
     /**
      * The type of the packet.
      */

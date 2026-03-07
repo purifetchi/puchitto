@@ -1,7 +1,7 @@
 /**
  * The execution environment for miniantics.
  */
-export default class MiniAnticsEnvironment {
+export class MiniAnticsEnvironment {
     /**
      * The parent for this environment
      */

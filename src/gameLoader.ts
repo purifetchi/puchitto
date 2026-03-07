@@ -1,12 +1,12 @@
 import * as THREE from 'three';
-import type Game from "./game.js";
-import type Level from "./level/level.js";
-import type LightData from "./level/lightData.js";
+import { Game } from './game';
+import { Level } from './level/level';
+import { LightData } from './level/lightData';
 
 /**
  * The level parser.
  */
-export default class GameLoader {
+export class GameLoader {
     /**
      * The game to load the entities to.
      */
@@ -37,7 +37,7 @@ export default class GameLoader {
     async load() {
         this._game.eventStream.emit("loading", 0)
 
-        const jsonString = this._game._dataManager.getStringLumpData("/level.json")
+        const jsonString = this._game._dataManager.getStringLumpData("/levelon")
         const level = JSON.parse(jsonString) as Level
 
         this._loadLevel(level)
@@ -80,7 +80,7 @@ export default class GameLoader {
         } else {
             const loadedEnts = this._totalEntities - this._awaitedEntities
             const percentage = loadedEnts / this._totalEntities
-            
+
             this._game.eventStream.emit("loading", percentage)
         }
     }

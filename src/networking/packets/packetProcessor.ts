@@ -1,6 +1,6 @@
-import type Game from "../../game.js";
-import type NetworkReader from "../networkReader.js";
-import { readEnvelope } from "./packetEnvelope.js";
+import { Game } from "../../game";
+import { NetworkReader } from "../networkReader";
+import { readEnvelope } from "./packetEnvelope";
 
 /**
  * The type for the packet handler.
@@ -17,9 +17,9 @@ type HandlerMap = {
 /**
  * The class tasked with processing packets.
  */
-export default class PacketProcessor {
+export class PacketProcessor {
     /**
-     * Contains the map of packet handlers. 
+     * Contains the map of packet handlers.
      */
     private _handlers: HandlerMap = {}
 

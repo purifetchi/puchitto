@@ -98,6 +98,7 @@ export abstract class Game {
      * An event stream for objects to subscribe to.
      */
     eventStream = new events.EventEmitter<{
+        connecting: [],
         connected: [],
         loading: [percent: number],
         loaded: [],
@@ -189,6 +190,8 @@ export abstract class Game {
         })
 
         this._addDefaultPacketHandlers()
+
+        this.eventStream.emit("connecting")
         this._networkManager.start()
     }
 

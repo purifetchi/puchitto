@@ -5,6 +5,11 @@ import { NetworkReader } from "./networkReader"
  */
 export class WebSocketListener {
     /**
+     * Called when the listener encounters an error.
+     */
+    onError? : (ev: Event) => Promise<unknown>
+
+    /**
      * Executed when we have incoming data.
      */
     onData? : (nr: NetworkReader) => Promise<unknown>
@@ -36,6 +41,11 @@ export class WebSocketListener {
         }
 
         this._webSocket = new WebSocket(this._url, ["puchitto"])
+        this._webSocket.onerror = async (ev) => {
+            if (this.onError !== undefined) {
+                await this.onError(ev)
+            }
+        }
 
         this._webSocket.onmessage = async (msg) => {
             const blob = msg.data as Blob

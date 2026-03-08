@@ -33,6 +33,13 @@ export class WebSocketListener {
     }
 
     /**
+     * Is this listening listening?
+     */
+    get listening() {
+        return this._webSocket !== undefined && this._webSocket.readyState == WebSocket.OPEN
+    }
+
+    /**
      * Listens on the WebSocket.
      */
     listen() {

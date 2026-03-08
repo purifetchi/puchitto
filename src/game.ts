@@ -100,6 +100,7 @@ export abstract class Game {
     eventStream = new events.EventEmitter<{
         connecting: [],
         connected: [],
+        connectionFailure: [event: Event],
         loading: [percent: number],
         loaded: [],
         objectAdded: [object: GameObject<unknown>]

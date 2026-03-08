@@ -50,8 +50,16 @@ export class NetworkManager {
      * Starts the networking subsystem.
      */
     start() {
+        if (this._webSocketListener.listening) {
+            throw new Error("The game is already listening!")
+        }
+
         this._webSocketListener.onData = async (nr: NetworkReader) => {
             await this._packetProcessor.processIncomingPacket(nr)
+        }
+
+        this._webSocketListener.onError = async (ev: Event) => {
+            this._game.eventStream.emit("connectionFailure", ev)
         }
 
         this._webSocketListener.listen()

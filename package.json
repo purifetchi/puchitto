@@ -50,7 +50,8 @@
     "devDependencies": {
         "@types/three": "^0.183.1",
         "three": "^0.183.2",
-        "tsup": "^8.5.1"
+        "tsup": "^8.5.1",
+        "@mary/events": "npm:@jsr/mary__events@^0.2.0"
     },
     "peerDependencies": {
         "@mary/events": "npm:@jsr/mary__events@^0.2.0",

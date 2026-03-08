@@ -51,6 +51,11 @@ export class Tween<T> implements TweenContract {
     private _active : boolean = true
 
     /**
+     * The easing method used.
+     */
+    private _easing? : (t: number) => number
+
+    /**
      * Constructs a new tween.
      * @param opts The options to pass.
      */
@@ -60,9 +65,10 @@ export class Tween<T> implements TweenContract {
         duration: number,
         interpolator: (start: T, end: T, t: number) => T,
         onUpdate?: (value: T) => void,
-        onEnd?: () => void
+        onEnd?: () => void,
+        easing?: (t: number) => number
     }) {
-        const { duration, startValue, endValue, interpolator, onUpdate, onEnd } = opts
+        const { duration, startValue, endValue, interpolator, onUpdate, onEnd, easing } = opts
 
         this._duration = duration
         this._value = startValue
@@ -71,6 +77,7 @@ export class Tween<T> implements TweenContract {
         this._interpolator = interpolator
         this._onUpdate = onUpdate
         this._onEnd = onEnd
+        this._easing = easing
     }
 
     /**
@@ -123,10 +130,15 @@ export class Tween<T> implements TweenContract {
             this._acc = 1
         }
 
+        let t = this._acc
+        if (this._easing !== undefined) {
+            t = this._easing(this._acc)
+        }
+
         this._value = this._interpolator(
             this._startValue,
             this._endValue,
-            this._acc
+            t
         )
 
         if (this._onUpdate !== undefined) {

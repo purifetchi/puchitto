@@ -18,6 +18,7 @@ import { DataManager } from './data/dataManager';
 import { NetworkManager } from './networking';
 import { MiniAnticsEnvironment } from './scripting';
 import { GameLoader } from '.';
+import { EffectComposer, OutlinePass, OutputPass, RenderPass } from 'three/examples/jsm/Addons.js';
 
 /**
  * The main class for the game.
@@ -84,6 +85,16 @@ export abstract class Game {
     private _baseEnvironment : MiniAnticsEnvironment
 
     /**
+     * The effect composer.
+     */
+    private _composer! : EffectComposer
+
+    /**
+     * The outline pass.
+     */
+    private _outlinePass! : OutlinePass
+
+    /**
      * An event stream for objects to subscribe to.
      */
     eventStream = new events.EventEmitter<{
@@ -136,6 +147,7 @@ export abstract class Game {
 
         this._renderer.setSize(window.innerWidth, window.innerHeight)
         this._renderer.setAnimationLoop(this.render.bind(this))
+        this._setupEffectPipeline()
 
         this._input = new Input()
         this._raycaster = new THREE.Raycaster()
@@ -146,6 +158,17 @@ export abstract class Game {
         this._addDefaultEventStreamListeners()
 
         window.addEventListener('resize', this._resize.bind(this))
+    }
+
+    /**
+     * Sets up the effect pipeline.
+     */
+    private _setupEffectPipeline() {
+        this._outlinePass = new OutlinePass(this._getResolution(), this._scene, this._camera.camera)
+        this._composer = new EffectComposer(this._renderer)
+        this._composer.addPass(new RenderPass(this._scene, this._camera.camera))
+        this._composer.addPass(this._outlinePass)
+        this._composer.addPass(new OutputPass())
     }
 
     /**
@@ -175,6 +198,14 @@ export abstract class Game {
     _resize() : void {
         this._camera.resize(window.innerWidth, window.innerHeight)
         this._renderer.setSize(window.innerWidth, window.innerHeight)
+    }
+
+    /**
+     * Gets the current resolution of the window.
+     * @returns The resolution.
+     */
+    _getResolution() : THREE.Vector2 {
+        return new THREE.Vector2(window.innerWidth, window.innerHeight)
     }
 
     /**
@@ -406,26 +437,38 @@ export abstract class Game {
      * Handles clickable entities.
      */
     private _handleClickableEntities() {
-        if (!this.input.mousePressed) {
-            return
-        }
-
-        const intersected = this.raycast()
-        const clickableObjects = intersected.map(obj => {
+        let gameObject
+        for (const obj of this.raycast()) {
             let actualObj = obj.object
             if (actualObj.type == "Mesh" && actualObj.parent !== null) {
                 actualObj = actualObj.parent
             }
 
-            if (!("clickable" in actualObj.userData) || actualObj.userData["clickable"] !== true) {
-                return undefined
+            if (actualObj.userData["clickable"] !== true) {
+                continue
             }
 
-            return this.getObjectById(actualObj.userData["id"])
-        }).filter(obj => obj !== undefined)
+            gameObject = this.getObjectById(actualObj.userData["id"])
+            if (gameObject === undefined) {
+                continue
+            }
 
-        for (const obj of clickableObjects) {
-            obj.runAntics("click")
+            const threeObject = gameObject.threeObject
+            if (this._outlinePass.selectedObjects.length < 1 || this._outlinePass.selectedObjects[0] !== threeObject) {
+                this._outlinePass.selectedObjects = [threeObject]
+            }
+
+            break
+        }
+
+        if (gameObject) {
+            if (this.input.mousePressed) {
+                gameObject.runAntics("click")
+            }
+        } else {
+            if (this._outlinePass.selectedObjects.length > 0) {
+                this._outlinePass.selectedObjects = []
+            }
         }
     }
 
@@ -441,7 +484,7 @@ export abstract class Game {
         this._stepTweens(dt)
         this._handleClickableEntities()
 
-        this._renderer.render(this._scene, this._camera.camera)
+        this._composer.render(dt)
         this._input.reset()
     }
 }

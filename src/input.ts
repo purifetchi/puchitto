@@ -20,13 +20,14 @@ export class Input {
     constructor() {
         window.addEventListener('pointermove', this._updatePointer.bind(this))
         window.addEventListener('mousedown', this._mouseDown.bind(this))
+        window.addEventListener('touchend', this._tapEnd.bind(this))
     }
 
     /**
      * Updates the position of the pointer.
      * @param evt The mouse event.
      */
-    _updatePointer(evt : MouseEvent) : void {
+    private _updatePointer(evt : MouseEvent) : void {
         this._pointer.x = evt.clientX
         this._pointer.y = evt.clientY
     }
@@ -35,7 +36,22 @@ export class Input {
      * Sets the mouse button as pressed.
      * @param evt The mouse event.
      */
-    _mouseDown(evt : MouseEvent) : void {
+    private _mouseDown(evt : MouseEvent) : void {
+        this._lmbPressed = true
+    }
+
+    /**
+     * Handles tapping.
+     * @param evt The touch event.
+     */
+    private _tapEnd(evt: TouchEvent): void {
+        const [touch] = evt.changedTouches
+        if (touch === undefined) {
+            return
+        }
+
+        this._pointer.x = touch.clientX
+        this._pointer.y = touch.clientY
         this._lmbPressed = true
     }
 

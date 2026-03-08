@@ -452,6 +452,10 @@ export abstract class Game {
      * Handles clickable entities.
      */
     private _handleClickableEntities() {
+        if (!this.input.hasMovedMouse) {
+            return
+        }
+        
         let gameObject
         for (const obj of this.raycast()) {
             let actualObj = obj.object

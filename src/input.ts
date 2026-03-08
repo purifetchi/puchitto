@@ -7,12 +7,17 @@ export class Input {
     /**
      * The position of the pointer.
      */
-    _pointer : Vector2 = new Vector2()
+    private _pointer : Vector2 = new Vector2()
 
     /**
      * Was the left mouse button pressed?
      */
-    _lmbPressed : boolean = false
+    private _lmbPressed : boolean = false
+
+    /**
+     * Has the mouse been moved since the last frame?
+     */
+    private _movedMouse : boolean = false
 
     /**
      * Constructs a new input class.
@@ -30,6 +35,8 @@ export class Input {
     private _updatePointer(evt : MouseEvent) : void {
         this._pointer.x = evt.clientX
         this._pointer.y = evt.clientY
+
+        this._movedMouse = true
     }
 
     /**
@@ -53,6 +60,7 @@ export class Input {
         this._pointer.x = touch.clientX
         this._pointer.y = touch.clientY
         this._lmbPressed = true
+        this._movedMouse = true
     }
 
     /**
@@ -60,6 +68,7 @@ export class Input {
      */
     reset() : void {
         this._lmbPressed = false
+        this._movedMouse = false
     }
 
     /**
@@ -74,5 +83,12 @@ export class Input {
      */
     get mousePressed() : boolean {
         return this._lmbPressed
+    }
+
+    /**
+     * Checks whether the mouse has been moved since the last frame.
+     */
+    get hasMovedMouse() : boolean {
+        return this._movedMouse
     }
 }

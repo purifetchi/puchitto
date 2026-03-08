@@ -143,7 +143,7 @@ export abstract class Game {
             transform: zeroTransform()
         })
 
-        this._renderer = new THREE.WebGLRenderer({ antialias: true })
+        this._renderer = new THREE.WebGLRenderer()
         this._renderer.setClearColor(0x000000, 0)
         this._clock = new THREE.Clock(true);
 
@@ -170,7 +170,16 @@ export abstract class Game {
         this._composer = new EffectComposer(this._renderer)
         this._composer.addPass(new RenderPass(this._scene, this._camera.camera))
         this._composer.addPass(this._outlinePass)
+        this.addCustomPasses(this._composer)
         this._composer.addPass(new OutputPass())
+    }
+
+    /**
+     * Invoked to add custom passes. Added after the render and outline passes have been added.
+     * @param composer The effect composer.
+     */
+    protected addCustomPasses(composer: EffectComposer) {
+
     }
 
     /**
@@ -200,8 +209,10 @@ export abstract class Game {
      * Called when the viewport resizes.
      */
     _resize() : void {
-        this._camera.resize(window.innerWidth, window.innerHeight)
-        this._renderer.setSize(window.innerWidth, window.innerHeight)
+        const { x, y } = this._getResolution()
+        this._camera.resize(x, y)
+        this._renderer.setSize(x, y)
+        this._composer.setSize(x, y)
     }
 
     /**

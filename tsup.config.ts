@@ -10,7 +10,8 @@ export default defineConfig({
         objects: 'src/objects/index.ts',
         data: 'src/data/index.ts',
         alf: 'src/data/alf/index.ts',
-        level: 'src/level/index.ts'
+        level: 'src/level/index.ts',
+        helpers: 'src/helpers/index.ts'
     },
     format: ['esm'],
     dts: true,

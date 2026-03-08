@@ -40,6 +40,10 @@
         "./alf": {
             "types": "./dist/alf.d.ts",
             "import": "./dist/alf.js"
+        },
+        "./helpers": {
+            "types": "./dist/helpers.d.ts",
+            "import": "./dist/helpers.js"
         }
     },
     "scripts": {

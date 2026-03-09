@@ -80,22 +80,73 @@ export class NetworkManager {
      * @param serializer The serialization method.
      */
     send<T extends PuchittoPacket>(packet: T, serializer: (pkt: T, nw: NetworkWriter) => void) {
-        // TODO: Pool NetworkWriters
-        const nw = new NetworkWriter()
+        const nw = this._rentNetworkWriter()
+        this._writePacketEnvelope(nw, packet.type)
+        serializer(packet, nw)
+        this._adjustPacketLengthAndSend(nw)
+        this._returnNetworkWriter(nw)
+    }
 
+    /**
+     * Begins a manual send of a packet.
+     * @param opCode The packet's OpCode.
+     */
+    beginManualSend(opCode: number): NetworkWriter {
+        const nw = this._rentNetworkWriter()
+        this._writePacketEnvelope(nw, opCode)
+
+        return nw
+    }
+
+    /**
+     * Finishes the manual send of the packet.
+     * @param nw The network writer.
+     */
+    finishManualSend(nw: NetworkWriter) {
+        this._adjustPacketLengthAndSend(nw)
+        this._returnNetworkWriter(nw)
+    }
+
+    /**
+     * Rents a network writer.
+     * @returns The network writer.
+     */
+    private _rentNetworkWriter() : NetworkWriter {
+        // TODO: Actually rent the network writer. I'll come back to this, I promise.
+        return new NetworkWriter()
+    }
+
+    /**
+     * Returns the rented network writer. For now it's a no-op.
+     * @param nw The network writer.
+     */
+    private _returnNetworkWriter(nw: NetworkWriter) {
+
+    }
+
+    /**
+     * Writes the packet envelope.
+     * @param nw The network writer.
+     * @param opCode The packet's OpCode.
+     */
+    private _writePacketEnvelope(nw: NetworkWriter, opCode: number) {
         const seq = Atomics.add(this._seq, 0, 1)
-        const opCode = packet.type
         nw.writeInt32(seq)
         nw.writeInt32(opCode)
-
-        const lengthPos = nw.position
         nw.writeInt32(0)
+    }
 
-        serializer(packet, nw)
+    /**
+     * Adjusts the length in the packet envelope and sends it.
+     * @param nw The network writer.
+     */
+    private _adjustPacketLengthAndSend(nw: NetworkWriter) {
+        const lengthPos = 4 * 2 // 2x int32 (seq, opcode)
+        const envelopeSize = 3 * 4 // (seq, opcode, length)
 
         // Calculate the length
         const totalLength = nw.position
-        const length = totalLength - (3 * 4)
+        const length = totalLength - envelopeSize
         nw.moveTo(lengthPos)
         nw.writeInt32(length)
 

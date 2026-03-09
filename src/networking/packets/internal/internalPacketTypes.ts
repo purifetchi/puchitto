@@ -30,5 +30,10 @@ export enum InternalPacketTypes {
     /**
      * Server -> Client: Removes a given entity.
      */
-    REMOVE_ENTITY = 6
+    REMOVE_ENTITY = 6,
+
+    /**
+     * Server <-> Client: A MiniAntics RPC call.
+     */
+    MINIANTICS_RPC = 7
 }

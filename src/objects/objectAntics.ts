@@ -11,6 +11,11 @@ export interface ObjectAntics {
     on: AnticsOn,
 
     /**
+     * The name of the antics script.
+     */
+    name: string,
+
+    /**
      * The actual script.
      */
     script: MiniAnticsScript

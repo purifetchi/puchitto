@@ -5,6 +5,8 @@ import { Game } from "../game"
 import { MiniAnticsEnvironment, MiniAnticsScript } from "../scripting"
 import { ObjectAntics } from "./objectAntics"
 import { GameObjectOptions } from "./gameObjectOptions"
+import { NetworkReader, NetworkWriter } from "../networking"
+import { InternalPacketTypes } from "../networking/packets/internal/internalPacketTypes"
 
 /**
  * The base game object.
@@ -84,15 +86,31 @@ export class GameObject<TEntityData> {
     /**
      * Runs the antics for this object.
      * @param on The type of antics to execute.
+     * @param name The name of the antics script to execute.
      */
-    runAntics(on: AnticsOn) {
+    runAntics(on: AnticsOn, name?: string) {
         for (const antic of this._objectAntics) {
             if (antic.on !== on) {
                 continue
             }
 
+            if (name !== undefined && antic.name !== name) {
+                continue
+            }
+
             antic.script.run(this._environment!)
         }
+    }
+
+    /**
+     * Handles an incoming RPC.
+     * @param name The name of the RPC.
+     * @param nr The network reader.
+     */
+    handleRpc(name: string, nr: NetworkReader) {
+        this._environment.set("reader", nr)
+        this.runAntics("rpc", name)
+        this._environment.set("reader", undefined)
     }
 
     /**
@@ -109,6 +127,7 @@ export class GameObject<TEntityData> {
         for (const def of defs) {
             antics.push({
                 on: def.on,
+                name: def.name ?? "",
                 script: new MiniAnticsScript(def.script)
             })
 
@@ -122,11 +141,46 @@ export class GameObject<TEntityData> {
     }
 
     /**
+     * Allows the object to set its own MiniAntics values.
+     * @param env The environment.
+     */
+    protected setupCustomMiniAnticsEnvironment(env: MiniAnticsEnvironment) {
+
+    }
+
+    /**
      * Sets up the MiniAntics environment.
      */
     private _setupMiniAntics() : void {
         this._environment = this.game.makeChildEnvironment()
         this._environment.set("self", this)
+        this._environment.set("invoke-rpc", (name: string) => {
+            return this._beginMiniAnticsRpcCall(name)
+        })
+        this._environment.set("send", (nw: NetworkWriter) => {
+            this._finishMiniAnticsRpcCall(nw)
+        })
+        this.setupCustomMiniAnticsEnvironment(this._environment)
+    }
+
+    /**
+     * Begins a MiniAntics RPC call.
+     * @param name The name of the RPC.
+     */
+    private _beginMiniAnticsRpcCall(name: string): NetworkWriter {
+        const nw = this.game._networkManager.beginManualSend(InternalPacketTypes.MINIANTICS_RPC)
+        nw.writeString(this.id) // TODO: This should be a number.
+        nw.writeString(name)
+
+        return nw
+    }
+
+    /**
+     * Finishes a MiniAntics RPC call.
+     * @param nw The network writer.
+     */
+    private _finishMiniAnticsRpcCall(nw: NetworkWriter) {
+        this.game._networkManager.finishManualSend(nw)
     }
 
     /**

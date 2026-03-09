@@ -445,6 +445,19 @@ export abstract class Game {
             this.removeObject(object)
         })
 
+        this._networkManager.addPacketHandler(InternalPacketTypes.MINIANTICS_RPC, async (nr, game) => {
+            const id = nr.readString()
+            const rpcName = nr.readString()
+            const object = game.getObjectById(id)
+
+            if (object === undefined) {
+                console.error(`[Network::miniAnticsRpc] We were told to run RPC ${rpcName} for object ${id} that doesn't exist.`)
+                return
+            }
+
+            object.handleRpc(rpcName, nr)
+        })
+
         this.registerCustomPacketHandlers()
     }
 
@@ -455,7 +468,7 @@ export abstract class Game {
         if (!this.input.hasMovedMouse) {
             return
         }
-        
+
         let gameObject
         for (const obj of this.raycast()) {
             let actualObj = obj.object

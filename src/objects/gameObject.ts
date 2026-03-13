@@ -57,17 +57,17 @@ export class GameObject<TEntityData> {
     /**
      * I hate type erasure.
      */
-    _dummy? : TEntityData
+    private _dummy? : TEntityData
 
     /**
      * The MiniAntics environment.
      */
-    _environment! : MiniAnticsEnvironment
+    private _environment! : MiniAnticsEnvironment
 
     /**
      * The antics of this object.
      */
-    _objectAntics : ObjectAntics[]
+    private _objectAntics : ObjectAntics[]
 
     /**
      * Constructs the game object.

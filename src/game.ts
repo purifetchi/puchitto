@@ -15,7 +15,7 @@ import { TweenContract } from './tweening/tweenContract';
 import { Input } from './input';
 import { EntityFactory } from './level/entityFactory';
 import { DataManager } from './data/dataManager';
-import { NetworkManager } from './networking';
+import { NetworkManager, NetworkReader, NetworkWriter } from './networking';
 import { MiniAnticsEnvironment } from './scripting';
 import { GameLoader } from '.';
 import { EffectComposer, OutlinePass, OutputPass, RenderPass } from 'three/examples/jsm/Addons.js';
@@ -349,26 +349,65 @@ export abstract class Game {
     private _makeBaseEnvironment() : MiniAnticsEnvironment {
         const environment = new MiniAnticsEnvironment()
 
+        environment.set("progn", (...args : any[]) => args.length > 1 ? args[args.length - 1] : undefined)
+        environment.set("pass", () => {})
+
         environment.set("+", (a: any, b: any) => a + b)
         environment.set("-", (a: any, b: any) => a - b)
         environment.set("*", (a: any, b: any) => a * b)
         environment.set("/", (a: any, b: any) => a / b)
         environment.set("null?", (a: any) => a === undefined || a === null)
-        environment.set("==", (a: any, b: any) => a == b)
-        environment.set("!=", (a: any, b: any) => a !== b)
-
+        environment.set("equal?", (a: any, b: any) => a == b)
+        environment.set("different?", (a: any, b: any) => a !== b)
         environment.set("print", (a: string) => console.log(`[MiniAntics] ${a}`))
-        environment.set("get-dom", (a: string) => document.getElementById(a))
 
-        environment.set("get-saved", (key: string) => localStorage.getItem(key))
-        environment.set("set-saved", (key: string, value: string) => localStorage.setItem(key, value))
-
-        environment.set("progn", (...args : any[]) => args.length > 1 ? args[args.length - 1] : undefined)
-        environment.set("pass", () => {})
+        this._registerClientSpecificMiniAnticsActions(environment)
+        this._registerNetworkSpecificMiniAnticsActions(environment)
 
         this.registerCustomMiniAnticsMethods(environment)
 
         return environment
+    }
+
+    /**
+     * Registers the MiniAntics methods specific to the client.
+     */
+    private _registerClientSpecificMiniAnticsActions(environment : MiniAnticsEnvironment) {
+        environment.set("get-dom", (a: string) => document.getElementById(a))
+
+        environment.set("get-saved", (key: string) => localStorage.getItem(key))
+        environment.set("set-saved", (key: string, value: string) => localStorage.setItem(key, value))
+    }
+
+    /**
+     * Registers network-specific MiniAntics methods.
+     * @param environment The MiniAntics environment.
+     */
+    private _registerNetworkSpecificMiniAnticsActions(environment : MiniAnticsEnvironment) {
+        environment.set("net-write-i32", (value: number, nw: NetworkWriter) => {
+            nw.writeInt32(value)
+            return nw
+        })
+
+        environment.set("net-write-bool", (value: boolean, nw: NetworkWriter) => {
+            nw.writeBoolean(value)
+            return nw
+        })
+
+        environment.set("net-write-f32", (value: number, nw: NetworkWriter) => {
+            nw.writeFloat(value)
+            return nw
+        })
+
+        environment.set("net-write-str", (value: string, nw: NetworkWriter) => {
+            nw.writeString(value)
+            return nw
+        })
+
+        environment.set("net-read-i32", (nr: NetworkReader) => nr.readInt32())
+        environment.set("net-read-bool", (nr: NetworkReader) => nr.readBoolean())
+        environment.set("net-read-f32", (nr: NetworkReader) => nr.readFloat())
+        environment.set("net-read-str", (nr: NetworkReader) => nr.readString())
     }
 
     /**

@@ -15,7 +15,12 @@ export class GameObject<TEntityData> {
     /**
      * The ID of this game object.
      */
-    id : string
+    id : number
+
+    /**
+     * The name of this game object.
+     */
+    name? : string | undefined
 
     /**
      * The tag this object has.
@@ -73,14 +78,18 @@ export class GameObject<TEntityData> {
      * Constructs the game object.
      */
     constructor(opts?: GameObjectOptions & TEntityData) {
-        // TODO: IDs should be required not optional!
-        this.id = opts?.id!
+        if (opts?.id === undefined) {
+            throw new Error("Tried to create a new game object without an ID!!!")
+        }
+
+        this.id = opts?.id
+        this.name = opts?.name
         this.tag = opts?.tag
         this.hasAuthority = opts?.hasAuthority ?? false
 
         this._objectAntics = this._parseAntics(opts?.antics)
 
-        console.log(`[GameObject::constructor] Constructed object with id ${this.id} and authority ${this.hasAuthority}`)
+        console.log(`[GameObject::constructor] Constructed object ${this.name} with id ${this.id} and authority ${this.hasAuthority}`)
     }
 
     /**
@@ -169,7 +178,7 @@ export class GameObject<TEntityData> {
      */
     private _beginMiniAnticsRpcCall(name: string): NetworkWriter {
         const nw = this.game._networkManager.beginManualSend(InternalPacketTypes.MINIANTICS_RPC)
-        nw.writeString(this.id) // TODO: This should be a number.
+        nw.writeInt32(this.id)
         nw.writeString(name)
 
         return nw

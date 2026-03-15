@@ -9,7 +9,7 @@ export interface RemoveEntityPacket extends PuchittoPacket {
     /**
      * The entity ID.
      */
-    id: string
+    id: number
 }
 
 /**
@@ -18,7 +18,7 @@ export interface RemoveEntityPacket extends PuchittoPacket {
  * @returns The read packet.
  */
 export const readRemoveEntityPacket = (nr: NetworkReader): RemoveEntityPacket => {
-    const id = nr.readString()
+    const id = nr.readInt32()
 
     return {
         type: InternalPacketTypes.REMOVE_ENTITY,

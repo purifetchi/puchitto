@@ -138,6 +138,7 @@ export abstract class Game {
         this._scene = new THREE.Scene()
 
         this._camera = new CameraObject({
+            id: 0, // The level always begins with id=1, so the camera can be id=0.
             width: window.innerWidth,
             height: window.innerHeight,
             transform: zeroTransform()
@@ -249,8 +250,17 @@ export abstract class Game {
      * Gets an object by its id.
      * @param id The ID.
      */
-    getObjectById(id : string) : GameObject<unknown> | undefined {
+    getObjectById(id: number) : GameObject<unknown> | undefined {
         const obj = this._objects.find(o => o.id == id)
+        return obj
+    }
+
+    /**
+     * Gets an object by its name.
+     * @param id The name.
+     */
+    getObjectByName(name: string) : GameObject<unknown> | undefined {
+        const obj = this._objects.find(o => o.name == name)
         return obj
     }
 
@@ -486,7 +496,7 @@ export abstract class Game {
         })
 
         this._networkManager.addPacketHandler(InternalPacketTypes.MINIANTICS_RPC, async (nr, game) => {
-            const id = nr.readString()
+            const id = nr.readInt32()
             const rpcName = nr.readString()
             const object = game.getObjectById(id)
 

@@ -5,7 +5,8 @@ import { JsonTransform } from "./jsonTransform";
  * A single entity
  */
 export interface LevelEntityDefinition {
-    id?: string | undefined,
+    id: number,
+    name?: string | undefined,
     tag?: string | undefined,
     antics?: AnticsDefinition[] | undefined,
     type: string,

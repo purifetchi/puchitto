@@ -7,7 +7,7 @@ import { NetworkReader } from "../../networkReader";
  * Sent from the server whenever it wants to create a new entity.
  */
 export interface CreateEntityPacket extends PuchittoPacket {
-    id: string,
+    id: number,
     entityName: string,
     position: Vector3,
     rotation: Quaternion
@@ -22,7 +22,7 @@ export interface CreateEntityPacket extends PuchittoPacket {
  * @returns The packet.
  */
 export const readCreateEntityPacket = (nr: NetworkReader): CreateEntityPacket => {
-    const id = nr.readString()
+    const id = nr.readInt32()
     const entityName = nr.readString()
     const position = nr.readVector3()
     const rotation = nr.readQuaternion()

@@ -22,7 +22,8 @@ type EntityConstructor<T> = new (opts: GameObjectOptions & ExtractDataType<T>) =
  * The entity creation definition.
  */
 interface EntityDefintionForCreation {
-    id?: string,
+    id: number,
+    name?: string
     tag?: string,
     antics?: AnticsDefinition[],
     hasAuthority?: boolean
@@ -77,6 +78,7 @@ export class EntityFactory {
 
         return createFn({
             id: ent.id,
+            name: ent.name,
             tag: ent.tag,
             antics: ent.antics,
             transform: jsonTransformToRegularTransform(ent.transform),
@@ -120,6 +122,7 @@ export class EntityFactory {
         const data = ent.data as ExtractDataType<T>
         const obj = new ctor({
             id: ent.id,
+            name: ent.name,
             tag: ent.tag,
             antics: ent.antics,
             loader: this._game._dataManager.mount.manager,

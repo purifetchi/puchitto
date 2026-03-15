@@ -273,6 +273,7 @@ export abstract class Game {
             (this.input.pointerPosition.x / window.innerWidth) * 2 - 1,
             -(this.input.pointerPosition.y / window.innerHeight) * 2 + 1
         )
+
         this._raycaster.setFromCamera(
             pointer,
             this._camera.camera
@@ -505,6 +506,11 @@ export abstract class Game {
      */
     private _handleClickableEntities() {
         if (!this.input.hasMovedMouse) {
+            if (this.input.mousePressed && this._outlinePass.selectedObjects.length > 0) {
+                const [ threeObject ] = this._outlinePass.selectedObjects
+                const gameObject = this.getObjectById(threeObject.userData["id"])
+                gameObject?.runAntics("click")
+            }
             return
         }
 

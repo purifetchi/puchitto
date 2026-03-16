@@ -117,6 +117,17 @@ export class Tween<T> implements TweenContract {
     }
 
     /**
+     * Resets everything this tween has done.
+     */
+    reset() : void {
+        this._active = false
+
+        if (this._onUpdate !== undefined) {
+            this._onUpdate(this._startValue)
+        }
+    }
+
+    /**
      * Steps a tween by the delta time.
      * @param dt The delta time.
      */

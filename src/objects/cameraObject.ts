@@ -1,9 +1,14 @@
-import { OrthographicCamera, Vector3 } from "three";
+import { AudioListener, OrthographicCamera, Vector3 } from "three";
 import { GameObject } from "./gameObject";
 import { CameraEntityData } from "../level/entities/cameraEntityData";
 import { GameObjectOptions } from "./gameObjectOptions";
 
 export class CameraObject extends GameObject<CameraEntityData> {
+    /**
+     * The audio listener.
+     */
+    listener: AudioListener
+
     /**
      * The zoom level.
      */
@@ -23,6 +28,9 @@ export class CameraObject extends GameObject<CameraEntityData> {
         )
         this._camera.position.set(4, 4, 4)
         this._camera.lookAt(new Vector3(0, 0, 0))
+
+        this.listener = new AudioListener()
+        this._camera.attach(this.listener)
     }
 
     /**

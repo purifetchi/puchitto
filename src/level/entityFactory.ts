@@ -1,6 +1,7 @@
 import { Game } from "../game";
 import type { CreateEntityPacket } from "../networking/packets/internal/createEntityPacket";
 import type { AnticsDefinition } from "../objects/anticsDefinition";
+import { AudioObject } from "../objects/audioObject";
 import { GameObject } from "../objects/gameObject";
 import { GameObjectOptions } from "../objects/gameObjectOptions";
 import { LightObject } from "../objects/lightObject";
@@ -45,7 +46,8 @@ export class EntityFactory {
      */
     private _factoryMap : Record<string, (ent: EntityDefintionForCreation) => GameObject<unknown>> = {
         "model": (ent: EntityDefintionForCreation) => this._constructFromEntityType<ModelObject>(ModelObject, ent),
-        "light": (ent: EntityDefintionForCreation) => this._constructFromEntityType<LightObject>(LightObject, ent)
+        "light": (ent: EntityDefintionForCreation) => this._constructFromEntityType<LightObject>(LightObject, ent),
+        "audio": (ent: EntityDefintionForCreation) => this._constructFromEntityType<AudioObject>(AudioObject, ent)
     }
 
     /**

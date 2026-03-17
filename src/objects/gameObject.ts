@@ -129,7 +129,7 @@ export class GameObject<TEntityData> {
      */
     private _parseAntics(defs: AnticsDefinition[] | undefined) : ObjectAntics[] {
         const antics : ObjectAntics[] = []
-        if (defs === undefined) {
+        if (defs === undefined || defs === null) {
             return antics
         }
 
@@ -206,12 +206,27 @@ export class GameObject<TEntityData> {
     }
 
     /**
+     * Gets the MiniAntics environment for this object.
+     */
+    get environment() {
+        return this._environment
+    }
+
+    /**
      * Sets the game for this object.
      * @param game The game.
      */
     setGame(game: Game) {
         this.game = game
         this._setupMiniAntics()
+        this.onGameSet()
+    }
+
+    /**
+     * Called when the game is set.
+     */
+    onGameSet() : void {
+
     }
 
     /**

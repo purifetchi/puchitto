@@ -15,7 +15,8 @@ export class MiniAnticsScript {
      * The spcial handlers for the script.
      */
     private _specialHandlers : Record<string, (args: Expression[], env: MiniAnticsEnvironment) => any> = {
-        "if": (args, env) => this._handleIf(args, env)
+        "if": (args, env) => this._handleIf(args, env),
+        "call-entity": (args, env) => this._handleCallEntity(args, env)
     }
 
     /**
@@ -94,6 +95,24 @@ export class MiniAnticsScript {
         } else {
             return this._eval(falseBranch, env)
         }
+    }
+
+    /**
+     * Handles calling a method in an entity's environment.
+     * @param args The arguments.
+     * @param env The environment.
+     */
+    private _handleCallEntity(args: Expression[], env: MiniAnticsEnvironment) : any {
+        const [ entitySelector, expr ] = args
+
+        const result: { environment: MiniAnticsEnvironment } = this._eval(entitySelector, env)
+        const isCallableObject = result.environment !== undefined
+
+        if (!isCallableObject) {
+            throw new Error(`Could not perform a MiniAntics call on the object: ${result}`)
+        }
+
+        return this._eval(expr, result.environment)
     }
 
     /**

@@ -16,3 +16,24 @@ export const easeOutBounce = (t: number): number => {
         return n1 * (t -= 2.625 / d1) * t + 0.984375
     }
 }
+
+/**
+ * An easing function that goes out elastically.
+ * @param t The current time.
+ */
+export const easeOutElastic = (t: number): number => {
+    const c4 = (2 * Math.PI) / 3;
+    return t === 0
+        ? 0
+        : t === 1
+            ? 1
+            : Math.pow(2, -10 * t) * Math.sin((t * 10 - 0.75) * c4) + 1;
+}
+
+/**
+ * An easing function that goes out exponentially.
+ * @param t The current time.
+ */
+export const easeOutExpo = (t: number): number => {
+    return t === 1 ? 1 : 1 - Math.pow(2, -10 * t)
+}

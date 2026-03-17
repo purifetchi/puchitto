@@ -372,6 +372,9 @@ export abstract class Game {
         environment.set("different?", (a: any, b: any) => a !== b)
         environment.set("print", (a: string) => console.log(`[MiniAntics] ${a}`))
 
+        environment.set("get-obj-by-name", (name: string) => this.getObjectByName(name))
+        environment.set("get-obj-by-id", (id: number) => this.getObjectById(id))
+
         this._registerClientSpecificMiniAnticsActions(environment)
         this._registerNetworkSpecificMiniAnticsActions(environment)
 

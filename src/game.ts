@@ -367,6 +367,7 @@ export abstract class Game {
         environment.set("-", (a: any, b: any) => a - b)
         environment.set("*", (a: any, b: any) => a * b)
         environment.set("/", (a: any, b: any) => a / b)
+        environment.set("not", (a: any) => !a)
         environment.set("null?", (a: any) => a === undefined || a === null)
         environment.set("equal?", (a: any, b: any) => a == b)
         environment.set("different?", (a: any, b: any) => a !== b)

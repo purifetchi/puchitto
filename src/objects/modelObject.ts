@@ -1,5 +1,5 @@
 import { MTLLoader, OBJLoader } from "three/examples/jsm/Addons.js";
-import { ClampToEdgeWrapping, Mesh, MeshToonMaterial } from "three";
+import { ClampToEdgeWrapping, Material, Mesh, MeshToonMaterial } from "three";
 import { GameObject } from "./gameObject";
 import { ModelEntityData } from "../level/entities/modelEntityData";
 import { GameObjectOptions } from "./gameObjectOptions";
@@ -19,24 +19,36 @@ export class ModelObject extends GameObject<ModelEntityData> {
                 data.position.set(transform.position.x, transform.position.y, transform.position.z)
                 data.quaternion.set(transform.rotation.x, transform.rotation.y, transform.rotation.z, transform.rotation.w)
 
-
                 this.threeObject = data
 
                 data.traverse(child => {
                     if (child instanceof Mesh) {
-                        const oldMaterial = child.material;
-                        const toonMaterial = new MeshToonMaterial({
-                            map: oldMaterial.map || null,
-                            color: oldMaterial.color || null
-                        });
-                        toonMaterial.transparent = opts.transparent
+                        const wasArray = Array.isArray(child.material)
+                        const oldMaterials: any[] = wasArray
+                            ? child.material
+                            : [child.material]
 
-                        if (toonMaterial.map !== null && opts.clamp) {
-                            toonMaterial.map.wrapS = ClampToEdgeWrapping
-                            toonMaterial.map.wrapT = ClampToEdgeWrapping
-                        }
+                        const materials = oldMaterials.map(mat => {
+                            const toon = new MeshToonMaterial({
+                                map: mat.map || null,
+                                color: mat.color || undefined,
+                                emissive: mat.emissive || undefined,
+                                emissiveMap: mat.emissiveMap || null,
+                                emissiveIntensity: mat.emissiveIntensity || undefined
+                            })
 
-                        child.material = toonMaterial
+                            toon.transparent = opts.transparent
+                            if (toon.map !== null && opts.clamp) {
+                                toon.map.wrapS = ClampToEdgeWrapping
+                                toon.map.wrapT = ClampToEdgeWrapping
+                            }
+
+                            return toon
+                        })
+
+                        child.material = wasArray
+                            ? materials
+                            : materials.pop()
                     }
                 })
 

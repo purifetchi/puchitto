@@ -5,6 +5,7 @@ import { AudioObject } from "../objects/audioObject";
 import { GameObject } from "../objects/gameObject";
 import { GameObjectOptions } from "../objects/gameObjectOptions";
 import { LightObject } from "../objects/lightObject";
+import { MarkerObject } from "../objects/markerObject";
 import { ModelObject } from "../objects/modelObject";
 import { LevelEntityDefinition } from "./levelEntityDefinition";
 import { jsonTransformToRegularTransform, type Transform } from "./transform";
@@ -45,9 +46,10 @@ export class EntityFactory {
      * The map of factories.
      */
     private _factoryMap : Record<string, (ent: EntityDefintionForCreation) => GameObject<unknown>> = {
-        "model": (ent: EntityDefintionForCreation) => this._constructFromEntityType<ModelObject>(ModelObject, ent),
-        "light": (ent: EntityDefintionForCreation) => this._constructFromEntityType<LightObject>(LightObject, ent),
-        "audio": (ent: EntityDefintionForCreation) => this._constructFromEntityType<AudioObject>(AudioObject, ent)
+        "model":  (ent: EntityDefintionForCreation) => this._constructFromEntityType<ModelObject>(ModelObject, ent),
+        "light":  (ent: EntityDefintionForCreation) => this._constructFromEntityType<LightObject>(LightObject, ent),
+        "audio":  (ent: EntityDefintionForCreation) => this._constructFromEntityType<AudioObject>(AudioObject, ent),
+        "marker": (ent: EntityDefintionForCreation) => this._constructFromEntityType<MarkerObject>(MarkerObject, ent)
     }
 
     /**

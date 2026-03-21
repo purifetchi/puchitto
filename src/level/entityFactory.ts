@@ -30,6 +30,7 @@ interface EntityDefintionForCreation {
     antics?: AnticsDefinition[],
     hasAuthority?: boolean
     transform: Transform,
+    visible: boolean,
     data: any
 }
 
@@ -86,6 +87,7 @@ export class EntityFactory {
             tag: ent.tag,
             antics: ent.antics,
             transform: jsonTransformToRegularTransform(ent.transform),
+            visible: ent.visible,
             data: ent.data
         })
     }
@@ -109,6 +111,7 @@ export class EntityFactory {
                 scale: packet.scale
             },
             hasAuthority: packet.isOwner,
+            visible: true,
             data: JSON.parse(packet.jsonEntityData)
         })
     }
@@ -131,6 +134,7 @@ export class EntityFactory {
             antics: ent.antics,
             loader: this._game._dataManager.mount.manager,
             transform: ent.transform,
+            visible: ent.visible,
             hasAuthority: ent.hasAuthority,
             ...data
         })

@@ -60,6 +60,11 @@ export class GameObject<TEntityData> {
     }>()
 
     /**
+     * Is this game object visible?
+     */
+    private _visible : boolean
+
+    /**
      * I hate type erasure.
      */
     private _dummy? : TEntityData
@@ -87,6 +92,7 @@ export class GameObject<TEntityData> {
         this.tag = opts?.tag
         this.hasAuthority = opts?.hasAuthority ?? false
 
+        this._visible = opts?.visible ?? true
         this._objectAntics = this._parseAntics(opts?.antics)
 
         console.log(`[GameObject::constructor] Constructed object ${this.name} with id ${this.id} and authority ${this.hasAuthority}`)
@@ -169,6 +175,8 @@ export class GameObject<TEntityData> {
         this._environment.set("send", (nw: NetworkWriter) => {
             this._finishMiniAnticsRpcCall(nw)
         })
+        this._environment.set("visible", () => this._visible)
+        this._environment.set("set-visible", (v: boolean) => this.setVisible(v))
         this.setupCustomMiniAnticsEnvironment(this._environment)
     }
 
@@ -202,7 +210,25 @@ export class GameObject<TEntityData> {
         this.game._scene.add(this.threeObject)
         this.eventStream.emit('attached')
 
+        this.setVisible(this._visible)
+
         this.runAntics("attach")
+    }
+
+    /**
+     * Sets whether this object is visible.
+     * @param isVisible Is this object visible.
+     */
+    setVisible(isVisible: boolean) {
+        this._visible = isVisible
+        this.threeObject.visible = this._visible
+    }
+
+    /**
+     * Is this object visible?
+     */
+    get visible() {
+        return this._visible
     }
 
     /**

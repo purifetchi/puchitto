@@ -9,5 +9,6 @@ export interface GameObjectOptions {
     hasAuthority? : boolean | undefined,
     loader? : LoadingManager | undefined,
     antics? : AnticsDefinition[] | undefined,
-    transform: Transform
+    transform: Transform,
+    visible: boolean
 }

@@ -11,5 +11,6 @@ export interface LevelEntityDefinition {
     antics?: AnticsDefinition[] | undefined,
     type: string,
     transform: JsonTransform,
+    visible: boolean,
     data: any
 }

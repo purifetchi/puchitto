@@ -19,6 +19,7 @@ import { NetworkManager, NetworkReader, NetworkWriter } from './networking';
 import { MiniAnticsEnvironment } from './scripting';
 import { GameLoader } from '.';
 import { CSS3DRenderer, EffectComposer, OutlinePass, OutputPass, RenderPass } from 'three/examples/jsm/Addons.js';
+import { KeepAlivePacket } from './networking/packets/internal/keepAlivePacket';
 
 /**
  * The main class for the game.
@@ -550,6 +551,12 @@ export abstract class Game {
             }
 
             object.handleRpc(rpcName, nr)
+        })
+
+        this._networkManager.addPacketHandler(InternalPacketTypes.KEEP_ALIVE, async (nr, game) => {
+            this._networkManager.send<KeepAlivePacket>({
+                type: InternalPacketTypes.KEEP_ALIVE
+            }, (_, _1) => {})
         })
 
         this.registerCustomPacketHandlers()

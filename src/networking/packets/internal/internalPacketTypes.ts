@@ -35,5 +35,10 @@ export enum InternalPacketTypes {
     /**
      * Server <-> Client: A MiniAntics RPC call.
      */
-    MINIANTICS_RPC = 7
+    MINIANTICS_RPC = 7,
+
+    /**
+     * Server <-> Client: Marks the client as still being there.
+     */
+    KEEP_ALIVE = 8
 }

@@ -15,6 +15,11 @@ export class WebSocketListener {
     onData? : (nr: NetworkReader) => Promise<unknown>
 
     /**
+     * Called when the server has disconnected.
+     */
+    onDisconnect? : (ev: Event) => Promise<unknown>
+
+    /**
      * The WebSocket we've connected to.
      */
     private _webSocket? : WebSocket
@@ -64,6 +69,15 @@ export class WebSocketListener {
             if (this.onData !== undefined) {
                 await this.onData(nr)
             }
+        }
+
+        this._webSocket.onclose = async (ev) => {
+            if (this.onDisconnect !== undefined) {
+                await this.onDisconnect(ev)
+            }
+
+            this._webSocket?.close()
+            this._webSocket = undefined
         }
     }
 

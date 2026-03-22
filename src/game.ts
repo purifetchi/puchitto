@@ -39,6 +39,9 @@ export abstract class Game {
      */
     _renderer! : THREE.WebGLRenderer
 
+    /**
+     * The CSS3D renderer. (TODO: This should be opt-in.)
+     */
     _css3D!: CSS3DRenderer
 
     /**
@@ -103,6 +106,7 @@ export abstract class Game {
         connecting: [],
         connected: [],
         connectionFailure: [event: Event],
+        disconnected: [event: Event],
         loading: [percent: number],
         loaded: [],
         objectAdded: [object: GameObject<unknown>]
@@ -137,11 +141,19 @@ export abstract class Game {
     }
 
     /**
-     * Sets up THREE
+     * Creates a blank scene.
      */
-    _setupThree() : void {
-        this._scene = new THREE.Scene()
+    createScene() : void {
+        if (this._objects.length > 0) {
+            for (const obj of this._objects) {
+                this._scene.remove(obj.threeObject)
+                obj.destroy()
+            }
+        }
 
+        this._objects = []
+
+        this._scene = new THREE.Scene()
         this._camera = new CameraObject({
             id: 0, // The level always begins with id=1, so the camera can be id=0.
             width: window.innerWidth,
@@ -149,6 +161,19 @@ export abstract class Game {
             transform: zeroTransform(),
             visible: true
         })
+
+        if (this._composer !== undefined) {
+            this._composer.reset()
+            this._composer.dispose()
+            this._setupEffectPipeline()
+        }
+    }
+
+    /**
+     * Sets up THREE
+     */
+    _setupThree() : void {
+        this.createScene()
 
         this._renderer = new THREE.WebGLRenderer()
         this._css3D = new CSS3DRenderer()
@@ -200,6 +225,14 @@ export abstract class Game {
     }
 
     /**
+     * Begins connecting.
+     */
+    connect() {
+        this.eventStream.emit("connecting")
+        this._networkManager.start()
+    }
+
+    /**
      * Starts the network stack.
      */
     _startNetwork(url: string) : void {
@@ -209,9 +242,7 @@ export abstract class Game {
         })
 
         this._addDefaultPacketHandlers()
-
-        this.eventStream.emit("connecting")
-        this._networkManager.start()
+        this.connect()
     }
 
     /**

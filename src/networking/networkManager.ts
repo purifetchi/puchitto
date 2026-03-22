@@ -62,6 +62,10 @@ export class NetworkManager {
             this._game.eventStream.emit("connectionFailure", ev)
         }
 
+        this._webSocketListener.onDisconnect = async (ev: Event) => {
+            this._game.eventStream.emit("disconnected", ev)
+        }
+
         this._webSocketListener.listen()
     }
 

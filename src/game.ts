@@ -18,7 +18,7 @@ import { DataManager } from './data/dataManager';
 import { NetworkManager, NetworkReader, NetworkWriter } from './networking';
 import { MiniAnticsEnvironment } from './scripting';
 import { GameLoader } from '.';
-import { EffectComposer, OutlinePass, OutputPass, RenderPass } from 'three/examples/jsm/Addons.js';
+import { CSS3DRenderer, EffectComposer, OutlinePass, OutputPass, RenderPass } from 'three/examples/jsm/Addons.js';
 
 /**
  * The main class for the game.
@@ -38,6 +38,8 @@ export abstract class Game {
      * The renderer responsible for rendering the scene.
      */
     _renderer! : THREE.WebGLRenderer
+
+    _css3D!: CSS3DRenderer
 
     /**
      * The clock used for getting the delta time.
@@ -128,7 +130,10 @@ export abstract class Game {
         this._startNetwork(server)
         this._baseEnvironment = this._makeBaseEnvironment()
 
-        element.appendChild(this._renderer.domElement);
+        this._renderer.domElement.style.position = "absolute"
+        this._css3D.domElement.style.position = "absolute"
+        element.appendChild(this._css3D.domElement)
+        element.appendChild(this._renderer.domElement)
     }
 
     /**
@@ -141,10 +146,13 @@ export abstract class Game {
             id: 0, // The level always begins with id=1, so the camera can be id=0.
             width: window.innerWidth,
             height: window.innerHeight,
-            transform: zeroTransform()
+            transform: zeroTransform(),
+            visible: true
         })
 
         this._renderer = new THREE.WebGLRenderer()
+        this._css3D = new CSS3DRenderer()
+        this._css3D.setSize(window.innerWidth, window.innerHeight)
         this._renderer.setClearColor(0x000000, 0)
         this._clock = new THREE.Clock(true);
 
@@ -212,6 +220,7 @@ export abstract class Game {
     _resize() : void {
         const { x, y } = this._getResolution()
         this._camera.resize(x, y)
+        this._css3D.setSize(x, y)
         this._renderer.setSize(x, y)
         this._composer.setSize(x, y)
     }
@@ -576,6 +585,7 @@ export abstract class Game {
         this._handleClickableEntities()
 
         this._composer.render(dt)
+        this._css3D.render(this._scene, this._camera.camera)
         this._input.reset()
     }
 }

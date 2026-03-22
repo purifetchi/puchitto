@@ -30,6 +30,7 @@ export class ModelObject extends GameObject<ModelEntityData> {
 
                         const materials = oldMaterials.map(mat => {
                             const toon = new MeshToonMaterial({
+                                name: mat.name || undefined,
                                 map: mat.map || null,
                                 color: mat.color || undefined,
                                 emissive: mat.emissive || undefined,

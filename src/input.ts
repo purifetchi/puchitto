@@ -20,6 +20,11 @@ export class Input {
     private _movedMouse : boolean = false
 
     /**
+     * Is input enabled?
+     */
+    private _enabled : boolean = true
+
+    /**
      * Constructs a new input class.
      */
     constructor() {
@@ -29,10 +34,25 @@ export class Input {
     }
 
     /**
+     * Sets whether the input should be enabled.
+     * @param enabled Whether input is enabled.
+     */
+    setEnabledInput(enabled: boolean) {
+        this._enabled = enabled
+
+        // Reset everything
+        this.reset()
+    }
+
+    /**
      * Updates the position of the pointer.
      * @param evt The mouse event.
      */
     private _updatePointer(evt : MouseEvent) : void {
+        if (!this._enabled) {
+            return
+        }
+
         this._pointer.x = evt.clientX
         this._pointer.y = evt.clientY
 
@@ -44,6 +64,10 @@ export class Input {
      * @param evt The mouse event.
      */
     private _mouseDown(evt : MouseEvent) : void {
+        if (!this._enabled) {
+            return
+        }
+
         this._lmbPressed = true
     }
 
@@ -52,6 +76,10 @@ export class Input {
      * @param evt The touch event.
      */
     private _tapEnd(evt: TouchEvent): void {
+        if (!this._enabled) {
+            return
+        }
+
         const [touch] = evt.changedTouches
         if (touch === undefined) {
             return

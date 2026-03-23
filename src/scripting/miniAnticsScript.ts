@@ -112,7 +112,15 @@ export class MiniAnticsScript {
             throw new Error(`Could not perform a MiniAntics call on the object: ${result}`)
         }
 
-        return this._eval(expr, result.environment)
+        // HACK: If we're in the middle of an RPC just copy over the reader.
+        //       We should deal with scoping better, but that's a problem for another me!
+        const lastReader = result.environment.get("reader")
+
+        result.environment.set("reader", env.get("reader"))
+        const evalResult = this._eval(expr, result.environment)
+        result.environment.set("reader", lastReader)
+
+        return evalResult
     }
 
     /**

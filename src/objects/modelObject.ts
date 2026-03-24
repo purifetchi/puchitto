@@ -5,6 +5,16 @@ import { ModelEntityData } from "../level/entities/modelEntityData";
 import { GameObjectOptions } from "./gameObjectOptions";
 
 export class ModelObject extends GameObject<ModelEntityData> {
+    private _materials : Record<string, Material> = {}
+
+    /**
+     * Gets a material by its name
+     * @param name The name of the material
+     */
+    getMaterialByName(name: string) : Material | undefined {
+        return this._materials[name]
+    }
+
     constructor(opts: GameObjectOptions & ModelEntityData) {
         super(opts)
 
@@ -43,6 +53,8 @@ export class ModelObject extends GameObject<ModelEntityData> {
                                 toon.map.wrapS = ClampToEdgeWrapping
                                 toon.map.wrapT = ClampToEdgeWrapping
                             }
+
+                            this._materials[toon.name] = toon
 
                             return toon
                         })

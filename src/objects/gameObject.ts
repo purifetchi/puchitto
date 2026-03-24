@@ -209,6 +209,7 @@ export class GameObject<TEntityData> {
         this.threeObject.userData["clickable"] = this.clickable
         this.game._scene.add(this.threeObject)
         this.eventStream.emit('attached')
+        this.game.eventStream.emit('objectAttached', this)
 
         this.setVisible(this._visible)
 

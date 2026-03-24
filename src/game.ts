@@ -110,7 +110,7 @@ export abstract class Game {
         disconnected: [event: Event],
         loading: [percent: number],
         loaded: [],
-        objectAdded: [object: GameObject<unknown>]
+        objectAttached: [object: GameObject<unknown>]
     }>()
 
     /**
@@ -281,7 +281,6 @@ export abstract class Game {
             this._scene.add(object.threeObject)
         }
 
-        this.eventStream.emit('objectAdded', object)
         object.onSceneAdded()
 
         return object
@@ -440,6 +439,8 @@ export abstract class Game {
      * @param environment The MiniAntics environment.
      */
     private _registerNetworkSpecificMiniAnticsActions(environment : MiniAnticsEnvironment) {
+        environment.set("is-server", false)
+
         environment.set("net-write-i32", (value: number, nw: NetworkWriter) => {
             nw.writeInt32(value)
             return nw

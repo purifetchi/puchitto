@@ -1,5 +1,5 @@
 import { MTLLoader, OBJLoader } from "three/examples/jsm/Addons.js";
-import { ClampToEdgeWrapping, Material, Mesh, MeshToonMaterial } from "three";
+import { ClampToEdgeWrapping, Material, Mesh, MeshBasicMaterial, MeshToonMaterial, Texture } from "three";
 import { GameObject } from "./gameObject";
 import { ModelEntityData } from "../level/entities/modelEntityData";
 import { GameObjectOptions } from "./gameObjectOptions";
@@ -40,12 +40,19 @@ export class ModelObject extends GameObject<ModelEntityData> {
 
                         const materials = oldMaterials.map(mat => {
                             const toon = new MeshToonMaterial({
+                                alphaTest: mat.alphaTest || 0,
+
+                                opacity: mat.opacity || 1,
+                                transparent: mat.transparent || false,
+
                                 name: mat.name || undefined,
                                 map: mat.map || null,
                                 color: mat.color || undefined,
                                 emissive: mat.emissive || undefined,
                                 emissiveMap: mat.emissiveMap || null,
-                                emissiveIntensity: mat.emissiveIntensity || undefined
+                                emissiveIntensity: mat.emissiveIntensity || 1,
+                                lightMap: mat.lightMap || null,
+                                lightMapIntensity: mat.lightMapIntensity || 1
                             })
 
                             toon.transparent = opts.transparent

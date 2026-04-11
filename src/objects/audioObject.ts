@@ -53,7 +53,6 @@ export class AudioObject extends GameObject<AudioEntityData> {
      * Called when we set the game.
      */
     onGameSet(): void {
-        console.log("hello")
         const audio = this._data.is3D
             ? new PositionalAudio(this.game._camera.listener)
             : new Audio(this.game._camera.listener)

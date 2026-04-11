@@ -40,8 +40,9 @@ export class AnimatorComponent {
     /**
      * Plays an animation.
      * @param name The name of the animation
+     * @param speed The speed of the animation. (1 by default)
      */
-    play(name: string) : void {
+    play(name: string, speed: number = 1) : void {
         const clip = this._clips[name]
 
         if (clip === undefined) {
@@ -54,7 +55,7 @@ export class AnimatorComponent {
         }
 
         clip.reset()
-            .setEffectiveTimeScale(1)
+            .setEffectiveTimeScale(speed)
             .setEffectiveWeight(1)
             .play()
 

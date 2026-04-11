@@ -349,7 +349,7 @@ export abstract class Game {
      * @param tween The tween to remove.
      */
     removeTween(tween : TweenContract) : void {
-        this._tweens.filter(t => t != tween)
+        this._tweens = this._tweens.filter(t => t != tween)
     }
 
     /**

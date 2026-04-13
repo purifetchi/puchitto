@@ -186,13 +186,15 @@ export abstract class Game {
     _setupThree() : void {
         this.createScene()
 
+        const res = this._getResolution()
+
         this._renderer = new THREE.WebGLRenderer()
         this._css3D = new CSS3DRenderer()
-        this._css3D.setSize(window.innerWidth, window.innerHeight)
+        this._css3D.setSize(res.x, res.y)
         this._renderer.setClearColor(0x000000, 0)
         this._clock = new THREE.Clock(true);
 
-        this._renderer.setSize(window.innerWidth, window.innerHeight)
+        this._renderer.setSize(res.x, res.y)
         this._renderer.setAnimationLoop(this.render.bind(this))
         this._setupEffectPipeline()
 
@@ -276,7 +278,10 @@ export abstract class Game {
      * @returns The resolution.
      */
     _getResolution() : THREE.Vector2 {
-        return new THREE.Vector2(window.innerWidth, window.innerHeight)
+        return new THREE.Vector2(
+            this._parentElement.clientWidth,
+            this._parentElement.clientHeight
+        )
     }
 
     /**
@@ -336,9 +341,12 @@ export abstract class Game {
      * @returns The list of intersected objects
      */
     raycast() : THREE.Intersection[] {
+        const res = this._getResolution()
+        const rect = this._parentElement.getBoundingClientRect()
+
         const pointer = new THREE.Vector2(
-            (this.input.pointerPosition.x / window.innerWidth) * 2 - 1,
-            -(this.input.pointerPosition.y / window.innerHeight) * 2 + 1
+            ((this.input.pointerPosition.x - rect.left) / res.x) * 2 - 1,
+            -((this.input.pointerPosition.y - rect.top) / res.y) * 2 + 1
         )
 
         this._raycaster.setFromCamera(

@@ -1,9 +1,10 @@
+import { NetworkListener } from "./networkListener"
 import { NetworkReader } from "./networkReader"
 
 /**
  * The WebSocket listener part of the framework.
  */
-export class WebSocketListener {
+export class WebSocketListener implements NetworkListener {
     /**
      * Called when the listener encounters an error.
      */
@@ -38,7 +39,7 @@ export class WebSocketListener {
     }
 
     /**
-     * Is this listening listening?
+     * Is this listener listening?
      */
     get listening() {
         return this._webSocket !== undefined && this._webSocket.readyState == WebSocket.OPEN

@@ -20,6 +20,7 @@ import { MiniAnticsEnvironment } from './scripting';
 import { GameLoader } from '.';
 import { CSS3DRenderer, EffectComposer, OutlinePass, OutputPass, RenderPass } from 'three/examples/jsm/Addons.js';
 import { KeepAlivePacket } from './networking/packets/internal/keepAlivePacket';
+import { NetworkListener } from './networking/networkListener';
 
 /**
  * The main class for the game.
@@ -101,6 +102,11 @@ export abstract class Game {
     private _outlinePass! : OutlinePass
 
     /**
+     * The parent element.
+     */
+    private _parentElement! : HTMLElement
+
+    /**
      * An event stream for objects to subscribe to.
      */
     eventStream = new events.EventEmitter<{
@@ -127,12 +133,15 @@ export abstract class Game {
      */
     run(opts: {
         element: HTMLElement,
-        server: string
+        server: string,
+        listenerFactory?: (url: string) => NetworkListener
     }) {
-        const { element, server } = opts
+        const { element, server, listenerFactory } = opts
+
+        this._parentElement = element
 
         this._setupThree()
-        this._startNetwork(server)
+        this._startNetwork(server, listenerFactory)
         this._baseEnvironment = this._makeBaseEnvironment()
 
         this._renderer.domElement.style.position = "absolute"
@@ -236,10 +245,14 @@ export abstract class Game {
     /**
      * Starts the network stack.
      */
-    _startNetwork(url: string) : void {
+    _startNetwork(
+        url: string,
+        listenerFactory?: (url: string) => NetworkListener
+    ) : void {
         this._networkManager = new NetworkManager({
             url: url,
-            game: this
+            game: this,
+            listenerFactory: listenerFactory
         })
 
         this._addDefaultPacketHandlers()

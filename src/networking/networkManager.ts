@@ -1,4 +1,5 @@
 import { Game } from "../game"
+import { NetworkListener } from "./networkListener"
 import { NetworkReader } from "./networkReader"
 import { NetworkWriter } from "./networkWriter"
 import { PacketHandler, PacketProcessor } from "./packets/packetProcessor"
@@ -17,7 +18,7 @@ export class NetworkManager {
     /**
      * The WebSocket listener for the current network manager.
      */
-    private _webSocketListener : WebSocketListener
+    private _listener : NetworkListener
 
     /**
      * The game this network manager is tied to.
@@ -35,13 +36,16 @@ export class NetworkManager {
      */
     constructor(opts: {
         url: string,
-        game: Game
+        game: Game,
+        listenerFactory : ((url: string) => NetworkListener) | undefined
     }) {
-        const { url, game } = opts
+        const { url, game, listenerFactory } = opts
         this._game = game
 
         this._packetProcessor = new PacketProcessor(this._game)
-        this._webSocketListener = new WebSocketListener(url)
+        this._listener = listenerFactory !== undefined
+            ? listenerFactory(url)
+            : new WebSocketListener(url)
 
         this._seq = new Int32Array(1)
     }
@@ -50,23 +54,23 @@ export class NetworkManager {
      * Starts the networking subsystem.
      */
     start() {
-        if (this._webSocketListener.listening) {
+        if (this._listener.listening) {
             throw new Error("The game is already listening!")
         }
 
-        this._webSocketListener.onData = async (nr: NetworkReader) => {
+        this._listener.onData = async (nr: NetworkReader) => {
             await this._packetProcessor.processIncomingPacket(nr)
         }
 
-        this._webSocketListener.onError = async (ev: Event) => {
+        this._listener.onError = async (ev: Event) => {
             this._game.eventStream.emit("connectionFailure", ev)
         }
 
-        this._webSocketListener.onDisconnect = async (ev: Event) => {
+        this._listener.onDisconnect = async (ev: Event) => {
             this._game.eventStream.emit("disconnected", ev)
         }
 
-        this._webSocketListener.listen()
+        this._listener.listen()
     }
 
     /**
@@ -155,6 +159,6 @@ export class NetworkManager {
         nw.writeInt32(length)
 
         const splice = new Uint8Array(nw.buffer, 0, totalLength)
-        this._webSocketListener.sendRaw(splice)
+        this._listener.sendRaw(splice)
     }
 }

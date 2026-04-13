@@ -116,7 +116,8 @@ export abstract class Game {
         disconnected: [event: Event],
         loading: [percent: number],
         loaded: [],
-        objectAttached: [object: GameObject<unknown>]
+        objectAttached: [object: GameObject<unknown>],
+        objectRemoved: [object: GameObject<unknown>]
     }>()
 
     /**
@@ -324,6 +325,9 @@ export abstract class Game {
     removeObject(object : GameObject<unknown>) : void {
         this._objects = this._objects.filter(o => o.id != object.id)
         this._scene.remove(object.threeObject)
+
+        this.eventStream.emit("objectRemoved", object)
+
         object.destroy()
     }
 

@@ -40,6 +40,18 @@ export class DataManager {
     }
 
     /**
+     * Loads a new package from a buffer.
+     * @param buffer The buffer.
+     */
+    async loadPackageFromBuffer(buffer: ArrayBufferLike) {
+        this._currentPackage?.dispose()
+        this._mount?.dispose()
+
+        this._currentPackage = new AlfPackage(buffer, "")
+        this._mount = new AlfMount(this._currentPackage)
+    }
+
+    /**
      * Gets the string lump data.
      * @param path The path to the lump.
      */

@@ -132,7 +132,7 @@ export class EntityFactory {
             name: ent.name,
             tag: ent.tag,
             antics: ent.antics,
-            loader: this._game._dataManager.mount.manager,
+            loader: this._game._dataManager.loader,
             transform: ent.transform,
             visible: ent.visible,
             hasAuthority: ent.hasAuthority,

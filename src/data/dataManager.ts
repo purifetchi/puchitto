@@ -1,29 +1,37 @@
-import { AlfMount } from "./alf/alfMount"
+import { LoadingManager } from "three"
 import { AlfPackage } from "./alf/alfPackage"
+import { DataProvider } from "./dataProvider"
+import { AlfProvider } from "./providers/alfProvider"
 
 /**
  * The manager for currently loaded data.
  */
 export class DataManager {
     /**
-     * The current package.
+     * The loading manager exposed by this data manager.
      */
-    private _currentPackage?: AlfPackage
+    public loader : LoadingManager
 
     /**
-     * The current mount.
+     * The list of providers
      */
-    private _mount?: AlfMount
+    private _providers: DataProvider[] = []
 
     /**
-     * The alf mount.
+     * Constructs a new data manager.
      */
-    get mount(): AlfMount {
-        if (this._mount === undefined) {
-            throw new Error("[DataManager::get_mount] No file mounted.")
-        }
+    constructor() {
+        this.loader = new LoadingManager()
+        this.loader.setURLModifier((url) => this._resolveUrlFromProviders(url))
+    }
 
-        return this._mount
+    /**
+     * Adds a new data provider.
+     * @param provider The provider.
+     */
+    addProvider(provider: DataProvider) {
+        // Insert as first in the provider chain.
+        this._providers = [provider, ...this._providers]
     }
 
     /**
@@ -31,12 +39,14 @@ export class DataManager {
      * @param path The path to the package
      */
     async loadPackage(path: string) {
-        this._currentPackage?.dispose()
-        this._mount?.dispose()
+        // TODO: We should not dispose all packages every time we do this.
+        //       Should packages have some sort of tag, so for example we only dispose scene ones?
+        this._disposeProviders()
 
         console.log(`[DataManager::loadPackage] Loading ${path}...`)
-        this._currentPackage = await AlfPackage.fetch(path)
-        this._mount = new AlfMount(this._currentPackage)
+
+        const alfPackage = await AlfPackage.fetch(path)
+        this.addProvider(new AlfProvider(alfPackage))
     }
 
     /**
@@ -44,31 +54,67 @@ export class DataManager {
      * @param buffer The buffer.
      */
     async loadPackageFromBuffer(buffer: ArrayBufferLike) {
-        this._currentPackage?.dispose()
-        this._mount?.dispose()
+        this._disposeProviders()
 
-        this._currentPackage = new AlfPackage(buffer, "")
-        this._mount = new AlfMount(this._currentPackage)
+        const alfPackage = new AlfPackage(buffer, "")
+        this.addProvider(new AlfProvider(alfPackage))
     }
 
     /**
      * Gets the string lump data.
      * @param path The path to the lump.
      */
-    getStringLumpData(path: string): string {
-        if (this._currentPackage === undefined) {
-            throw new Error("[DataManager::getStringLumpData] No file mounted.")
-        }
-
-        const lump = this._currentPackage.getLump(path)
-        if (lump === undefined) {
-            throw new Error(`[EntityFactory::getStringLumpData] Lump ${path} wasn't found.`)
-        }
-
-        const data = this._currentPackage.read(lump)
-        const decoder = new TextDecoder('utf-8')
-        const stringData = decoder.decode(data)
-
+    async getStringData(path: string): Promise<string> {
+        const url = this.loader.resolveURL(path)
+        const data = await fetch(url)
+        const stringData = await data.text()
         return stringData
+    }
+
+    /**
+     * Disposes the providers.
+     */
+    private _disposeProviders() {
+        for (const provider of this._providers) {
+            provider.dispose()
+        }
+
+        this._providers = []
+    }
+
+    /**
+     * Resolves an asset's url from the list of providers.
+     * @param url The URL to resolve.
+     */
+    private _resolveUrlFromProviders(url: string): string {
+        let relativePath = url
+        if (relativePath.startsWith(".")) {
+            relativePath = relativePath.substring(1)
+        }
+
+        for (const provider of this._providers) {
+            const maybeResolved = provider.getUrl(relativePath)
+
+            if (maybeResolved !== undefined) {
+                return maybeResolved
+            }
+        }
+
+        // Fallback to just relying on the current href to resolve it.
+        try {
+            const urlObj = new URL(url, window.location.href)
+            if (urlObj.origin === window.location.origin) {
+                relativePath = urlObj.pathname.substring(1)
+            }
+        } catch (e) {
+
+        }
+
+        relativePath = decodeURIComponent(relativePath)
+        if (!relativePath.startsWith("/")) {
+            relativePath = "/" + relativePath
+        }
+
+        return url
     }
 }

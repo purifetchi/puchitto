@@ -50,7 +50,8 @@ export class EntityFactory {
         "model":  (ent: EntityDefintionForCreation) => this._constructFromEntityType<ModelObject>(ModelObject, ent),
         "light":  (ent: EntityDefintionForCreation) => this._constructFromEntityType<LightObject>(LightObject, ent),
         "audio":  (ent: EntityDefintionForCreation) => this._constructFromEntityType<AudioObject>(AudioObject, ent),
-        "marker": (ent: EntityDefintionForCreation) => this._constructFromEntityType<MarkerObject>(MarkerObject, ent)
+        "marker": (ent: EntityDefintionForCreation) => this._constructFromEntityType<MarkerObject>(MarkerObject, ent),
+        "camera": (ent: EntityDefintionForCreation) => this._constructFromEntityType<CameraObject>(CameraObject, ent)
     }
 
     /**

@@ -94,7 +94,7 @@ export abstract class Game {
     /**
      * The effect composer.
      */
-    private _composer! : EffectComposer
+    private _composer? : EffectComposer
 
     /**
      * The outline pass.
@@ -164,28 +164,37 @@ export abstract class Game {
 
         this._objects = []
 
+        const res = this._getResolution()
         this._scene = new THREE.Scene()
         this._camera = new CameraObject({
             id: 0, // The level always begins with id=1, so the camera can be id=0.
-            width: window.innerWidth,
-            height: window.innerHeight,
+            width: res.x,
+            height: res.y,
             transform: zeroTransform(),
             visible: true
         })
 
+        this.setMainCamera(this._camera)
+    }
+
+    /**
+     * Sets the main camera.
+     * @param camera The camera to use as the main camera.
+     */
+    setMainCamera(camera: CameraObject) {
+        this._camera = camera
         if (this._composer !== undefined) {
             this._composer.reset()
             this._composer.dispose()
-            this._setupEffectPipeline()
         }
+
+        this._setupEffectPipeline()
     }
 
     /**
      * Sets up THREE
      */
     _setupThree() : void {
-        this.createScene()
-
         const res = this._getResolution()
 
         this._renderer = new THREE.WebGLRenderer()
@@ -196,7 +205,6 @@ export abstract class Game {
 
         this._renderer.setSize(res.x, res.y)
         this._renderer.setAnimationLoop(this.render.bind(this))
-        this._setupEffectPipeline()
 
         this._input = new Input()
         this._raycaster = new THREE.Raycaster()
@@ -207,6 +215,8 @@ export abstract class Game {
         this._addDefaultEventStreamListeners()
 
         window.addEventListener('resize', this._resize.bind(this))
+
+        this.createScene()
     }
 
     /**
@@ -270,7 +280,7 @@ export abstract class Game {
         this._camera.resize(x, y)
         this._css3D.setSize(x, y)
         this._renderer.setSize(x, y)
-        this._composer.setSize(x, y)
+        this._composer?.setSize(x, y)
     }
 
     /**
@@ -648,7 +658,7 @@ export abstract class Game {
         this._stepTweens(dt)
         this._handleClickableEntities()
 
-        this._composer.render(dt)
+        this._composer?.render(dt)
         this._css3D.render(this._scene, this._camera.camera)
         this._input.reset()
     }

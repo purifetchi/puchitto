@@ -3,5 +3,6 @@
  */
 export interface CameraEntityData {
     width: number,
-    height: number
+    height: number,
+    type?: "ortographic" | "perspective"
 }

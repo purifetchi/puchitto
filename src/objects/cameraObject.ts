@@ -1,4 +1,4 @@
-import { AudioListener, OrthographicCamera, Vector3 } from "three";
+import { AudioListener, Camera, OrthographicCamera, PerspectiveCamera, Vector3 } from "three";
 import { GameObject } from "./gameObject";
 import { CameraEntityData } from "../level/entities/cameraEntityData";
 import { GameObjectOptions } from "./gameObjectOptions";
@@ -17,20 +17,19 @@ export class CameraObject extends GameObject<CameraEntityData> {
     /**
      * The THREE camera.
      */
-    private _camera : OrthographicCamera
+    private _camera : Camera
 
     constructor(opts : GameObjectOptions & CameraEntityData) {
         super(opts)
 
-        const aspect = opts.width / opts.height
-        this._camera = new OrthographicCamera(
-            -this._zoom * aspect, this._zoom * aspect, this._zoom, -this._zoom, -10, 1000
-        )
+        this._camera = this._makeCamera(opts)
         this._camera.position.set(4, 4, 4)
         this._camera.lookAt(new Vector3(0, 0, 0))
 
         this.listener = new AudioListener()
         this._camera.attach(this.listener)
+
+        this.threeObject = this._camera
     }
 
     /**
@@ -40,11 +39,20 @@ export class CameraObject extends GameObject<CameraEntityData> {
      */
     resize(width: number, height: number) : void {
         const aspect = width / height
-        this._camera.left = -this._zoom * aspect
-        this._camera.right = this._zoom * aspect
-        this._camera.top = this._zoom
-        this._camera.bottom = -this._zoom
-        this._camera.updateProjectionMatrix()
+
+        if (this._camera instanceof OrthographicCamera)
+        {
+            this._camera.left = -this._zoom * aspect
+            this._camera.right = this._zoom * aspect
+            this._camera.top = this._zoom
+            this._camera.bottom = -this._zoom
+            this._camera.updateProjectionMatrix()
+        }
+        else if (this._camera instanceof PerspectiveCamera)
+        {
+            this._camera.aspect = aspect
+            this._camera.updateProjectionMatrix()
+        }
     }
 
     /**
@@ -52,5 +60,21 @@ export class CameraObject extends GameObject<CameraEntityData> {
      */
     get camera() {
         return this._camera
+    }
+
+    /**
+     * Creates the camera.
+     */
+    private _makeCamera(opts: CameraEntityData): Camera {
+        const aspect = opts.width / opts.height
+
+        if (opts.type === "perspective")
+        {
+            return new PerspectiveCamera(90, aspect, 0.1, 1000)
+        }
+
+        return new OrthographicCamera(
+            -this._zoom * aspect, this._zoom * aspect, this._zoom, -this._zoom, -10, 1000
+        )
     }
 }

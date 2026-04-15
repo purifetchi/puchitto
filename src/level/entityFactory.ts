@@ -1,5 +1,6 @@
 import { Game } from "../game";
 import type { CreateEntityPacket } from "../networking/packets/internal/createEntityPacket";
+import { CameraObject } from "../objects";
 import type { AnticsDefinition } from "../objects/anticsDefinition";
 import { AudioObject } from "../objects/audioObject";
 import { GameObject } from "../objects/gameObject";
@@ -8,7 +9,7 @@ import { LightObject } from "../objects/lightObject";
 import { MarkerObject } from "../objects/markerObject";
 import { ModelObject } from "../objects/modelObject";
 import { LevelEntityDefinition } from "./levelEntityDefinition";
-import { jsonTransformToRegularTransform, type Transform } from "./transform";
+import { jsonTransformToRegularTransform, zeroTransform, type Transform } from "./transform";
 
 /**
  * Extracts the data type of the game object.

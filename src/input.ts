@@ -10,9 +10,19 @@ export class Input {
     private _pointer : Vector2 = new Vector2()
 
     /**
+     * The delta movement of the pointer.
+     */
+    private _delta : Vector2 = new Vector2()
+
+    /**
      * Was the left mouse button pressed?
      */
     private _lmbPressed : boolean = false
+
+    /**
+     * Was left mouse button held?
+     */
+    private _lmbHeld : boolean = false
 
     /**
      * Has the mouse been moved since the last frame?
@@ -25,12 +35,28 @@ export class Input {
     private _enabled : boolean = true
 
     /**
+     * The array of active scancodes
+     */
+    private _scanCodeMap : Set<string> = new Set<string>()
+
+    /**
+     * The canvas rendered to.
+     */
+    private _canvas : HTMLCanvasElement
+
+    /**
      * Constructs a new input class.
      */
-    constructor() {
-        window.addEventListener('pointermove', this._updatePointer.bind(this))
-        window.addEventListener('mousedown', this._mouseDown.bind(this))
-        window.addEventListener('touchend', this._tapEnd.bind(this))
+    constructor(canvas: HTMLCanvasElement) {
+        this._canvas = canvas
+
+        canvas.addEventListener('pointermove', this._updatePointer.bind(this))
+        canvas.addEventListener('mousedown', this._mouseDown.bind(this))
+        canvas.addEventListener('mouseup', this._mouseUp.bind(this))
+        canvas.addEventListener('touchend', this._tapEnd.bind(this))
+
+        window.addEventListener('keydown', this._keyDown.bind(this))
+        window.addEventListener('keyup', this._keyUp.bind(this))
     }
 
     /**
@@ -45,6 +71,20 @@ export class Input {
     }
 
     /**
+     * Locks the cursor.
+     */
+    lockCursor() {
+        this._canvas.requestPointerLock()
+    }
+
+    /**
+     * Unlocks the cursor.
+     */
+    unlockCursor() {
+        document.exitPointerLock()
+    }
+
+    /**
      * Updates the position of the pointer.
      * @param evt The mouse event.
      */
@@ -52,6 +92,9 @@ export class Input {
         if (!this._enabled) {
             return
         }
+
+        this._delta.x = evt.movementX
+        this._delta.y = evt.movementY
 
         this._pointer.x = evt.clientX
         this._pointer.y = evt.clientY
@@ -69,6 +112,39 @@ export class Input {
         }
 
         this._lmbPressed = true
+        this._lmbHeld = true
+    }
+
+    /**
+     * Sets the mouse button as released.
+     * @param evt The mouse event.
+     */
+    private _mouseUp(evt : MouseEvent) : void {
+        if (!this._enabled) {
+            return
+        }
+
+        this._lmbHeld = false
+    }
+
+    /**
+     * Sets a key as pressed.
+     * @param evt The keyboard event.
+     */
+    private _keyDown(evt : KeyboardEvent) : void {
+        if (!this._enabled) {
+            return
+        }
+
+        this._scanCodeMap.add(evt.code)
+    }
+
+    /**
+     * Sets a key as released.
+     * @param evt The keyboard event.
+     */
+    private _keyUp(evt : KeyboardEvent) : void {
+        this._scanCodeMap.delete(evt.code)
     }
 
     /**
@@ -95,8 +171,33 @@ export class Input {
      * Resets the input data.
      */
     reset() : void {
+        this._delta.x = 0
+        this._delta.y = 0
         this._lmbPressed = false
         this._movedMouse = false
+    }
+
+    /**
+     * Checks whether a key is pressed or not.
+     * @param keyCode The keycode.
+     * @returns Whether it is down.
+     */
+    keyDown(keyCode: string) : boolean {
+        return this._scanCodeMap.has(keyCode)
+    }
+
+    /**
+     * Checks whether the cursor is locked.
+     */
+    get cursorLocked() : boolean {
+        return document.pointerLockElement === this._canvas
+    }
+
+    /**
+     * Gets the mouse delta.
+     */
+    get mouseDelta() : Vector2 {
+        return this._delta
     }
 
     /**
@@ -111,6 +212,13 @@ export class Input {
      */
     get mousePressed() : boolean {
         return this._lmbPressed
+    }
+
+    /**
+     * Checks if the mouse was held.
+     */
+    get mouseHeld() : boolean {
+        return this._lmbHeld
     }
 
     /**

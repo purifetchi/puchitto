@@ -206,14 +206,13 @@ export abstract class Game {
         this._renderer.setSize(res.x, res.y)
         this._renderer.setAnimationLoop(this.render.bind(this))
 
-        this._input = new Input()
+        this._input = new Input(this._renderer.domElement)
         this._raycaster = new THREE.Raycaster()
         this._dataManager = new DataManager()
         this._entityFactory = new EntityFactory(this)
         this.registerCustomEntities(this._entityFactory)
 
         this._addDefaultEventStreamListeners()
-
         window.addEventListener('resize', this._resize.bind(this))
 
         this.createScene()

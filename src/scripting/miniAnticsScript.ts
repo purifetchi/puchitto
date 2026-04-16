@@ -106,7 +106,7 @@ export class MiniAnticsScript {
         const [ entitySelector, expr ] = args
 
         const result: { environment: MiniAnticsEnvironment } = this._eval(entitySelector, env)
-        const isCallableObject = result.environment !== undefined
+        const isCallableObject = result?.environment !== undefined
 
         if (!isCallableObject) {
             throw new Error(`Could not perform a MiniAntics call on the object: ${result}`)

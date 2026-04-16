@@ -21,6 +21,7 @@ import { GameLoader } from '.';
 import { CSS3DRenderer, EffectComposer, OutlinePass, OutputPass, RenderPass } from 'three/examples/jsm/Addons.js';
 import { KeepAlivePacket } from './networking/packets/internal/keepAlivePacket';
 import { NetworkListener } from './networking/networkListener';
+import { MOUSE_LEFT } from './mouse';
 
 /**
  * The main class for the game.
@@ -602,7 +603,7 @@ export abstract class Game {
      */
     private _handleClickableEntities() {
         if (!this.input.hasMovedMouse) {
-            if (this.input.mousePressed && this._outlinePass.selectedObjects.length > 0) {
+            if (this.input.mousePressed(MOUSE_LEFT) && this._outlinePass.selectedObjects.length > 0) {
                 const [ threeObject ] = this._outlinePass.selectedObjects
                 const gameObject = this.getObjectById(threeObject.userData["id"])
                 gameObject?.runAntics("click")
@@ -635,7 +636,7 @@ export abstract class Game {
         }
 
         if (gameObject) {
-            if (this.input.mousePressed) {
+            if (this.input.mousePressed(MOUSE_LEFT)) {
                 gameObject.runAntics("click")
             }
         } else {

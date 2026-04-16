@@ -1,4 +1,5 @@
 import { Vector2 } from "three";
+import { MOUSE_LEFT, MouseButton } from "./mouse";
 
 /**
  * The class responsible for handling input.
@@ -13,16 +14,6 @@ export class Input {
      * The delta movement of the pointer.
      */
     private _delta : Vector2 = new Vector2()
-
-    /**
-     * Was the left mouse button pressed?
-     */
-    private _lmbPressed : boolean = false
-
-    /**
-     * Was left mouse button held?
-     */
-    private _lmbHeld : boolean = false
 
     /**
      * Has the mouse been moved since the last frame?
@@ -43,6 +34,16 @@ export class Input {
      * The canvas rendered to.
      */
     private _canvas : HTMLCanvasElement
+
+    /**
+     * The held buttons.
+     */
+    private _held : Uint8Array = new Uint8Array(3)
+
+    /**
+     * The pressed buttons.
+     */
+    private _pressed : Uint8Array = new Uint8Array(3)
 
     /**
      * Constructs a new input class.
@@ -111,8 +112,10 @@ export class Input {
             return
         }
 
-        this._lmbPressed = true
-        this._lmbHeld = true
+        if (evt.button < this._held.length) {
+            this._held[evt.button] = 1
+            this._pressed[evt.button] = 1
+        }
     }
 
     /**
@@ -124,7 +127,9 @@ export class Input {
             return
         }
 
-        this._lmbHeld = false
+        if (evt.button < this._held.length) {
+            this._held[evt.button] = 0
+        }
     }
 
     /**
@@ -137,6 +142,8 @@ export class Input {
         }
 
         this._scanCodeMap.add(evt.code)
+
+        evt.preventDefault()
     }
 
     /**
@@ -145,6 +152,8 @@ export class Input {
      */
     private _keyUp(evt : KeyboardEvent) : void {
         this._scanCodeMap.delete(evt.code)
+
+        evt.preventDefault()
     }
 
     /**
@@ -163,7 +172,7 @@ export class Input {
 
         this._pointer.x = touch.clientX
         this._pointer.y = touch.clientY
-        this._lmbPressed = true
+        this._pressed[MOUSE_LEFT] = 1
         this._movedMouse = true
     }
 
@@ -173,7 +182,7 @@ export class Input {
     reset() : void {
         this._delta.x = 0
         this._delta.y = 0
-        this._lmbPressed = false
+        this._pressed.fill(0)
         this._movedMouse = false
     }
 
@@ -184,6 +193,24 @@ export class Input {
      */
     keyDown(keyCode: string) : boolean {
         return this._scanCodeMap.has(keyCode)
+    }
+
+    /**
+     * Checks whether a mouse button has been pressed.
+     * @param button The mouse button.
+     * @returns Whether it is pressed.
+     */
+    mousePressed(button: MouseButton) {
+        return this._pressed[button] === 1
+    }
+
+     /**
+     * Checks whether a mouse button is held.
+     * @param button The mouse button.
+     * @returns Whether it is held.
+     */
+    mouseHeld(button: MouseButton) {
+        return this._held[button] === 1
     }
 
     /**
@@ -205,20 +232,6 @@ export class Input {
      */
     get pointerPosition() : Vector2 {
         return this._pointer
-    }
-
-    /**
-     * Checks if the mouse was pressed this frame.
-     */
-    get mousePressed() : boolean {
-        return this._lmbPressed
-    }
-
-    /**
-     * Checks if the mouse was held.
-     */
-    get mouseHeld() : boolean {
-        return this._lmbHeld
     }
 
     /**

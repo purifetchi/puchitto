@@ -21,7 +21,8 @@ import { GameLoader } from '.';
 import { CSS3DRenderer, EffectComposer, OutlinePass, OutputPass, RenderPass } from 'three/examples/jsm/Addons.js';
 import { KeepAlivePacket } from './networking/packets/internal/keepAlivePacket';
 import { NetworkListener } from './networking/networkListener';
-import { MOUSE_LEFT } from './mouse';
+import { GameSystem } from './systems/gameSystem';
+import { InteractableObjectSystem } from './systems/interactableObjectSystem';
 
 /**
  * The main class for the game.
@@ -98,14 +99,14 @@ export abstract class Game {
     private _composer? : EffectComposer
 
     /**
-     * The outline pass.
-     */
-    private _outlinePass! : OutlinePass
-
-    /**
      * The parent element.
      */
     private _parentElement! : HTMLElement
+
+    /**
+     * The registered game systems.
+     */
+    private _gameSystems: GameSystem[] = []
 
     /**
      * An event stream for objects to subscribe to.
@@ -117,6 +118,7 @@ export abstract class Game {
         disconnected: [event: Event],
         loading: [percent: number],
         loaded: [],
+        sceneCreated: [],
         objectAttached: [object: GameObject<unknown>],
         objectRemoved: [object: GameObject<unknown>]
     }>()
@@ -176,6 +178,8 @@ export abstract class Game {
         })
 
         this.setMainCamera(this._camera)
+
+        this.eventStream.emit('sceneCreated')
     }
 
     /**
@@ -216,6 +220,7 @@ export abstract class Game {
         this._addDefaultEventStreamListeners()
         window.addEventListener('resize', this._resize.bind(this))
 
+        this.registerCustomGameSystems()
         this.createScene()
     }
 
@@ -223,10 +228,13 @@ export abstract class Game {
      * Sets up the effect pipeline.
      */
     private _setupEffectPipeline() {
-        this._outlinePass = new OutlinePass(this._getResolution(), this._scene, this._camera.camera)
         this._composer = new EffectComposer(this._renderer)
         this._composer.addPass(new RenderPass(this._scene, this._camera.camera))
-        this._composer.addPass(this._outlinePass)
+
+        for (const system of this._gameSystems) {
+            system.registerComposerEffects(this._composer)
+        }
+
         this.addCustomPasses(this._composer)
         this._composer.addPass(new OutputPass())
     }
@@ -245,6 +253,22 @@ export abstract class Game {
      */
     protected registerCustomEntities(factory: EntityFactory) {
 
+    }
+
+    /**
+     * Registers custom game systems.
+     */
+    protected registerCustomGameSystems() {
+        this.addGameSystem(new InteractableObjectSystem())
+    }
+
+    /**
+     * Adds a game system into the game system stack.
+     * @param system The game system.
+     */
+    addGameSystem(system: GameSystem) {
+        system.registerGame(this)
+        this._gameSystems.push(system)
     }
 
     /**
@@ -599,54 +623,6 @@ export abstract class Game {
     }
 
     /**
-     * Handles clickable entities.
-     */
-    private _handleClickableEntities() {
-        if (!this.input.hasMovedMouse) {
-            if (this.input.mousePressed(MOUSE_LEFT) && this._outlinePass.selectedObjects.length > 0) {
-                const [ threeObject ] = this._outlinePass.selectedObjects
-                const gameObject = this.getObjectById(threeObject.userData["id"])
-                gameObject?.runAntics("click")
-            }
-            return
-        }
-
-        let gameObject
-        for (const obj of this.raycast()) {
-            let actualObj = obj.object
-            if (actualObj.type == "Mesh" && actualObj.parent !== null) {
-                actualObj = actualObj.parent
-            }
-
-            if (actualObj.userData["clickable"] !== true) {
-                continue
-            }
-
-            gameObject = this.getObjectById(actualObj.userData["id"])
-            if (gameObject === undefined) {
-                continue
-            }
-
-            const threeObject = gameObject.threeObject
-            if (this._outlinePass.selectedObjects.length < 1 || this._outlinePass.selectedObjects[0] !== threeObject) {
-                this._outlinePass.selectedObjects = [threeObject]
-            }
-
-            break
-        }
-
-        if (gameObject) {
-            if (this.input.mousePressed(MOUSE_LEFT)) {
-                gameObject.runAntics("click")
-            }
-        } else {
-            if (this._outlinePass.selectedObjects.length > 0) {
-                this._outlinePass.selectedObjects = []
-            }
-        }
-    }
-
-    /**
      * Ticks all the objects and renders the scene.
      */
     render() : void {
@@ -656,7 +632,9 @@ export abstract class Game {
         }
 
         this._stepTweens(dt)
-        this._handleClickableEntities()
+        for (const system of this._gameSystems) {
+            system.tick(dt)
+        }
 
         this._composer?.render(dt)
         this._css3D.render(this._scene, this._camera.camera)

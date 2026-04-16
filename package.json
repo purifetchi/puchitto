@@ -44,6 +44,10 @@
         "./helpers": {
             "types": "./dist/helpers.d.ts",
             "import": "./dist/helpers.js"
+        },
+        "./systems": {
+            "types": "./dist/systems.d.ts",
+            "import": "./dist/systems.js"
         }
     },
     "scripts": {

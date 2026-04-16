@@ -11,7 +11,8 @@ export default defineConfig({
         data: 'src/data/index.ts',
         alf: 'src/data/alf/index.ts',
         level: 'src/level/index.ts',
-        helpers: 'src/helpers/index.ts'
+        helpers: 'src/helpers/index.ts',
+        systems: 'src/systems/index.ts'
     },
     format: ['esm'],
     dts: true,

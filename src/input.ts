@@ -141,8 +141,12 @@ export class Input {
             return
         }
 
-        this._scanCodeMap.add(evt.code)
+        const tgt = evt.target as HTMLElement
+        if (tgt && (tgt.tagName === 'INPUT' || tgt.tagName === 'TEXTAREA')) {
+            return
+        }
 
+        this._scanCodeMap.add(evt.code)
         evt.preventDefault()
     }
 

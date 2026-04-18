@@ -1,6 +1,6 @@
 export * from './level'
 export * from './levelEntityDefinition'
-export * from './transform'
+export * from './transformData'
 export * from './entityFactory'
 export * from './entities/blankEntityData'
 export * from './entities/cameraEntityData'

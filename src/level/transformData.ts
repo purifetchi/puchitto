@@ -4,7 +4,7 @@ import { JsonTransform } from "./jsonTransform";
 /**
  * An entity transform.
  */
-export interface Transform {
+export interface TransformData {
     position: Vector3,
     rotation: Quaternion,
     scale: Vector3
@@ -14,7 +14,7 @@ export interface Transform {
  * Returns a new zero transform.
  * @returns A zero-transform
  */
-export function zeroTransform() : Transform {
+export function zeroTransform() : TransformData {
     return {
         position: new Vector3(0, 0, 0),
         rotation: new Quaternion().identity(),
@@ -27,7 +27,7 @@ export function zeroTransform() : Transform {
  * @param json The JSON transform.
  * @returns The regular transform.
  */
-export function jsonTransformToRegularTransform(json: JsonTransform): Transform {
+export function jsonTransformToRegularTransform(json: JsonTransform): TransformData {
     return {
         position: new Vector3(
             json.position[0],

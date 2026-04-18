@@ -9,7 +9,7 @@ import { LightObject } from "../objects/lightObject";
 import { MarkerObject } from "../objects/markerObject";
 import { ModelObject } from "../objects/modelObject";
 import { LevelEntityDefinition } from "./levelEntityDefinition";
-import { jsonTransformToRegularTransform, zeroTransform, type Transform } from "./transform";
+import { jsonTransformToRegularTransform, zeroTransform, type TransformData } from "./transformData";
 
 /**
  * Extracts the data type of the game object.
@@ -30,7 +30,7 @@ interface EntityDefintionForCreation {
     tag?: string,
     antics?: AnticsDefinition[],
     hasAuthority?: boolean
-    transform: Transform,
+    transform: TransformData,
     visible: boolean,
     data: any
 }

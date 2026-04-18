@@ -53,6 +53,11 @@ export class GameObject<TEntityData> {
     attached : boolean = false
 
     /**
+     * The transform of this object.
+     */
+    readonly transform : Transform
+
+    /**
      * The event stream for this object.
      */
     eventStream = new EventEmitter<{
@@ -82,10 +87,15 @@ export class GameObject<TEntityData> {
     /**
      * Constructs the game object.
      */
-    constructor(opts?: GameObjectOptions & TEntityData) {
+    constructor(opts?: GameObjectOptions) {
         if (opts?.id === undefined) {
             throw new Error("Tried to create a new game object without an ID!!!")
         }
+
+        this.transform = new Transform(this)
+        this.transform.position = opts.transform.position
+        this.transform.rotation = opts.transform.rotation
+        this.transform.scale = opts.transform.scale
 
         this.id = opts?.id
         this.name = opts?.name
@@ -207,11 +217,14 @@ export class GameObject<TEntityData> {
         this.attached = true
         this.threeObject.userData["id"] = this.id
         this.threeObject.userData["clickable"] = this.clickable
+
+        this.transform.bind()
+        this.setVisible(this._visible)
+
         this.game._scene.add(this.threeObject)
+
         this.eventStream.emit('attached')
         this.game.eventStream.emit('objectAttached', this)
-
-        this.setVisible(this._visible)
 
         this.runAntics("attach")
     }

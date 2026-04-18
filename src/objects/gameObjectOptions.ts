@@ -1,5 +1,5 @@
 import type { LoadingManager } from "three";
-import { type Transform } from "../level/transform";
+import { type TransformData } from "../level/transformData";
 import type { AnticsDefinition } from "./anticsDefinition";
 
 export interface GameObjectOptions {
@@ -9,6 +9,6 @@ export interface GameObjectOptions {
     hasAuthority? : boolean | undefined,
     loader? : LoadingManager | undefined,
     antics? : AnticsDefinition[] | undefined,
-    transform: Transform,
+    transform: TransformData,
     visible: boolean
 }

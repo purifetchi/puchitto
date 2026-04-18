@@ -56,7 +56,7 @@ export abstract class Game {
     /**
      * The objects within this scene.
      */
-    _objects : GameObject<unknown>[] = []
+    _objects : GameObject[] = []
 
     /**
      * The tweens within this scene.
@@ -119,8 +119,8 @@ export abstract class Game {
         loading: [percent: number],
         loaded: [],
         sceneCreated: [],
-        objectAttached: [object: GameObject<unknown>],
-        objectRemoved: [object: GameObject<unknown>]
+        objectAttached: [object: GameObject],
+        objectRemoved: [object: GameObject]
     }>()
 
     /**
@@ -171,11 +171,13 @@ export abstract class Game {
         this._scene = new THREE.Scene()
         this._camera = new CameraObject({
             id: 0, // The level always begins with id=1, so the camera can be id=0.
-            width: res.x,
-            height: res.y,
             transform: zeroTransform(),
             visible: true
         })
+
+        this._camera.width = res.x
+        this._camera.height = res.y
+        this.addObject(this._camera)
 
         this.setMainCamera(this._camera)
 
@@ -322,7 +324,7 @@ export abstract class Game {
      * Adds a new game object.
      * @param object The object to add.
      */
-    addObject<T extends GameObject<unknown>>(object : T) : T | undefined {
+    addObject<T extends GameObject>(object : T) : T | undefined {
         if (this.getObjectById(object.id) !== undefined) {
             return
         }
@@ -343,7 +345,7 @@ export abstract class Game {
      * Gets an object by its id.
      * @param id The ID.
      */
-    getObjectById(id: number) : GameObject<unknown> | undefined {
+    getObjectById(id: number) : GameObject | undefined {
         const obj = this._objects.find(o => o.id == id)
         return obj
     }
@@ -352,7 +354,7 @@ export abstract class Game {
      * Gets an object by its name.
      * @param id The name.
      */
-    getObjectByName(name: string) : GameObject<unknown> | undefined {
+    getObjectByName(name: string) : GameObject | undefined {
         const obj = this._objects.find(o => o.name == name)
         return obj
     }
@@ -361,7 +363,7 @@ export abstract class Game {
      * Removes an object from the scene.
      * @param object The object to remove.
      */
-    removeObject(object : GameObject<unknown>) : void {
+    removeObject(object : GameObject) : void {
         this._objects = this._objects.filter(o => o.id != object.id)
         this._scene.remove(object.threeObject)
 

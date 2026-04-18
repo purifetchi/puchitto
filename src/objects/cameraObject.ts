@@ -1,13 +1,31 @@
 import { AudioListener, Camera, OrthographicCamera, PerspectiveCamera, Vector3 } from "three";
 import { GameObject } from "./gameObject";
-import { CameraEntityData } from "../level/entities/cameraEntityData";
 import { GameObjectOptions } from "./gameObjectOptions";
+import { Serialized } from "../serialization";
 
-export class CameraObject extends GameObject<CameraEntityData> {
+export class CameraObject extends GameObject {
+    /**
+     * The width of the camera.
+     */
+    @Serialized("width")
+    accessor width!: number
+
+    /**
+     * The height of the camera.
+     */
+    @Serialized("height")
+    accessor height!: number
+
+    /**
+     * The type of the camera.
+     */
+    @Serialized("type")
+    accessor type: "ortographic" | "perspective" | undefined
+
     /**
      * The audio listener.
      */
-    listener: AudioListener
+    listener!: AudioListener
 
     /**
      * The zoom level.
@@ -17,13 +35,14 @@ export class CameraObject extends GameObject<CameraEntityData> {
     /**
      * The THREE camera.
      */
-    private _camera : Camera
+    private _camera! : Camera
 
-    constructor(opts : GameObjectOptions & CameraEntityData) {
+    constructor(opts : GameObjectOptions) {
         super(opts)
+    }
 
-        this._camera = this._makeCamera(opts)
-        this._camera.position.set(4, 4, 4)
+    onGameSet(): void {
+        this._camera = this._makeCamera()
         this._camera.lookAt(new Vector3(0, 0, 0))
 
         this.listener = new AudioListener()
@@ -65,10 +84,10 @@ export class CameraObject extends GameObject<CameraEntityData> {
     /**
      * Creates the camera.
      */
-    private _makeCamera(opts: CameraEntityData): Camera {
-        const aspect = opts.width / opts.height
+    private _makeCamera(): Camera {
+        const aspect = this.width / this.height
 
-        if (opts.type === "perspective")
+        if (this.type === "perspective")
         {
             return new PerspectiveCamera(90, aspect, 0.1, 1000)
         }

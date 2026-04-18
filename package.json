@@ -48,6 +48,10 @@
         "./systems": {
             "types": "./dist/systems.d.ts",
             "import": "./dist/systems.js"
+        },
+        "./serialization": {
+            "types": "./dist/serialization.d.ts",
+            "import": "./dist/serialization.js"
         }
     },
     "scripts": {

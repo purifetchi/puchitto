@@ -12,7 +12,8 @@ export default defineConfig({
         alf: 'src/data/alf/index.ts',
         level: 'src/level/index.ts',
         helpers: 'src/helpers/index.ts',
-        systems: 'src/systems/index.ts'
+        systems: 'src/systems/index.ts',
+        serialization: 'src/serialization/index.ts'
     },
     format: ['esm'],
     dts: true,

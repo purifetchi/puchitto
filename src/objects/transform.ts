@@ -95,9 +95,18 @@ export class Transform {
      */
     bind() {
         console.log(`[Transform::bind] Binding ${this._obj.name} with ${this._storedPosition} ${this._storedRotation} ${this._storedScale}`)
-        this._obj.threeObject.position.copy(this._storedPosition!)
-        this._obj.threeObject.quaternion.copy(this._storedRotation!)
-        this._obj.threeObject.scale.copy(this._storedScale!)
+
+        if (this._storedPosition !== undefined) {
+            this._obj.threeObject.position.copy(this._storedPosition)
+        }
+
+        if (this._storedRotation !== undefined) {
+            this._obj.threeObject.quaternion.copy(this._storedRotation)
+        }
+
+        if (this._storedScale) {
+            this._obj.threeObject.scale.copy(this._storedScale)
+        }
 
         this._storedPosition = undefined
         this._storedRotation = undefined

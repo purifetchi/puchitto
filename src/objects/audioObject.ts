@@ -1,17 +1,42 @@
 import { PositionalAudio, Audio, AudioLoader, LoadingManager } from "three";
-import { AudioEntityData } from "../level/entities/audioEntityData";
 import { GameObject } from "./gameObject";
 import { GameObjectOptions } from "./gameObjectOptions";
 import { MiniAnticsEnvironment } from "../scripting";
+import { Serialized } from "../serialization";
 
 /**
  * The audio playback object.
  */
-export class AudioObject extends GameObject<AudioEntityData> {
+export class AudioObject extends GameObject {
     /**
-     * The entity data.
+     * The path to the audio data.
      */
-    private _data : AudioEntityData
+    @Serialized("path")
+    accessor path!: string
+
+    /**
+     * Is the audio 3D?
+     */
+    @Serialized("is3D")
+    accessor is3D!: boolean
+
+    /**
+     * Should the audio autoplay?
+     */
+    @Serialized("autoplay")
+    accessor autoplay!: boolean
+
+    /**
+     * Is the audio looping?
+     */
+    @Serialized("looping")
+    accessor looping!: boolean
+
+    /**
+     * The volume of the audio?
+     */
+    @Serialized("volume")
+    accessor volume!: number
 
     /**
      * The data loader.
@@ -27,12 +52,9 @@ export class AudioObject extends GameObject<AudioEntityData> {
      * Constructs a new Audio playback object.
      * @param opts The options.
      */
-    constructor(opts: GameObjectOptions & AudioEntityData) {
+    constructor(opts: GameObjectOptions) {
         super(opts)
-        this._data = opts
         this._loader = opts.loader
-
-        // TODO: Position.
     }
 
     /**
@@ -53,20 +75,20 @@ export class AudioObject extends GameObject<AudioEntityData> {
      * Called when we set the game.
      */
     onGameSet(): void {
-        const audio = this._data.is3D
+        const audio = this.is3D
             ? new PositionalAudio(this.game._camera.listener)
             : new Audio(this.game._camera.listener)
 
         const loader = new AudioLoader(this._loader)
-        loader.load(this._data.path, (data) => {
+        loader.load(this.path, (data) => {
             audio.setBuffer(data)
-            audio.setVolume(this._data.volume)
-            audio.setLoop(this._data.looping)
+            audio.setVolume(this.volume)
+            audio.setLoop(this.looping)
 
             this.threeObject = audio
             this._attach()
 
-            if (this._data.autoplay) {
+            if (this.autoplay) {
                 audio.play()
             }
         })

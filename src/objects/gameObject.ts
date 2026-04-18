@@ -7,11 +7,12 @@ import { ObjectAntics } from "./objectAntics"
 import { GameObjectOptions } from "./gameObjectOptions"
 import { NetworkReader, NetworkWriter } from "../networking"
 import { InternalPacketTypes } from "../networking/packets/internal/internalPacketTypes"
+import { Transform } from "./transform"
 
 /**
  * The base game object.
  */
-export class GameObject<TEntityData> {
+export abstract class GameObject {
     /**
      * The ID of this game object.
      */
@@ -70,11 +71,6 @@ export class GameObject<TEntityData> {
     private _visible : boolean
 
     /**
-     * I hate type erasure.
-     */
-    private _dummy? : TEntityData
-
-    /**
      * The MiniAntics environment.
      */
     private _environment! : MiniAnticsEnvironment
@@ -125,6 +121,21 @@ export class GameObject<TEntityData> {
 
             antic.script.run(this._environment!)
         }
+    }
+
+    /**
+     * Called when a serialized property changes.
+     * @param name The name of the serialized property.
+     */
+    onSerializedPropertyChanged(name: string): void {
+
+    }
+
+    /**
+     * Gets all of the antics attached to this object.
+     */
+    get antics() {
+        return this._objectAntics
     }
 
     /**

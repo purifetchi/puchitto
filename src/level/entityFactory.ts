@@ -8,18 +8,14 @@ import { GameObjectOptions } from "../objects/gameObjectOptions";
 import { LightObject } from "../objects/lightObject";
 import { MarkerObject } from "../objects/markerObject";
 import { ModelObject } from "../objects/modelObject";
+import { SerializedMetadataProps } from "../serialization";
 import { LevelEntityDefinition } from "./levelEntityDefinition";
 import { jsonTransformToRegularTransform, zeroTransform, type TransformData } from "./transformData";
 
 /**
- * Extracts the data type of the game object.
- */
-type ExtractDataType<T> = T extends GameObject<infer C> ? C : never;
-
-/**
  * Defines the constructor of a game object.
  */
-type EntityConstructor<T> = new (opts: GameObjectOptions & ExtractDataType<T>) => T;
+type EntityConstructor<T> = new (opts: GameObjectOptions) => T;
 
 /**
  * The entity creation definition.
@@ -47,10 +43,10 @@ export class EntityFactory {
     /**
      * The map of factories.
      */
-    private _factoryMap : Record<string, (ent: EntityDefintionForCreation) => GameObject<unknown>> = {
-        "model":  (ent: EntityDefintionForCreation) => this._constructFromEntityType<ModelObject>(ModelObject, ent),
-        "light":  (ent: EntityDefintionForCreation) => this._constructFromEntityType<LightObject>(LightObject, ent),
-        "audio":  (ent: EntityDefintionForCreation) => this._constructFromEntityType<AudioObject>(AudioObject, ent),
+    private _factoryMap: Record<string, (ent: EntityDefintionForCreation) => GameObject> = {
+        "model": (ent: EntityDefintionForCreation) => this._constructFromEntityType<ModelObject>(ModelObject, ent),
+        "light": (ent: EntityDefintionForCreation) => this._constructFromEntityType<LightObject>(LightObject, ent),
+        "audio": (ent: EntityDefintionForCreation) => this._constructFromEntityType<AudioObject>(AudioObject, ent),
         "marker": (ent: EntityDefintionForCreation) => this._constructFromEntityType<MarkerObject>(MarkerObject, ent),
         "camera": (ent: EntityDefintionForCreation) => this._constructFromEntityType<CameraObject>(CameraObject, ent)
     }
@@ -67,8 +63,25 @@ export class EntityFactory {
      * @param type The type of the entity, as string
      * @param ctor The constructor.
      */
-    registerEntity<T extends GameObject<Record<string, any>>>(type: string, ctor: EntityConstructor<T>) {
+    registerEntity<T extends GameObject>(type: string, ctor: EntityConstructor<T>) {
         this._factoryMap[type] = (ent) => this._constructFromEntityType<T>(ctor, ent)
+    }
+
+    create<T extends GameObject>(type: string, id: number, data: Record<string, any>): T | undefined {
+        const createFn = this._factoryMap[type]
+        if (createFn === undefined) {
+            console.error(`[EntityFactory::createFromLevelDefinition] Could not find create function for entity type ${type}.`)
+            return
+        }
+
+        return createFn({
+            id: id,
+            name: "New Entity",
+            antics: [],
+            transform: zeroTransform(),
+            visible: true,
+            data: data
+        }) as T
     }
 
     /**
@@ -76,7 +89,7 @@ export class EntityFactory {
      * @param ent The entity definition.
      * @returns The game object.
      */
-    createFromLevelDefinition(ent: LevelEntityDefinition): GameObject<unknown> | undefined {
+    createFromLevelDefinition(ent: LevelEntityDefinition): GameObject | undefined {
         const createFn = this._factoryMap[ent.type]
         if (createFn === undefined) {
             console.error(`[EntityFactory::createFromLevelDefinition] Could not find create function for entity type ${ent.type}.`)
@@ -98,7 +111,7 @@ export class EntityFactory {
      * Creates an entity from the create entity packet.
      * @param packet The packet.
      */
-    createFromCreateEntityPacket(packet: CreateEntityPacket): GameObject<unknown> | undefined {
+    createFromCreateEntityPacket(packet: CreateEntityPacket): GameObject | undefined {
         const createFn = this._factoryMap[packet.entityName]
         if (createFn === undefined) {
             console.error(`[EntityFactory::createFromLevelDefinition] Could not find create function for entity type ${packet.entityName}.`)
@@ -124,11 +137,10 @@ export class EntityFactory {
      * @param ent The entity data.
      * @returns The constructed entity.
      */
-    private _constructFromEntityType<T extends GameObject<Record<string, any>>>(
+    private _constructFromEntityType<T extends GameObject>(
         ctor: EntityConstructor<T>,
         ent: EntityDefintionForCreation
-    ) : T {
-        const data = ent.data as ExtractDataType<T>
+    ): T {
         const obj = new ctor({
             id: ent.id,
             name: ent.name,
@@ -137,9 +149,17 @@ export class EntityFactory {
             loader: this._game._dataManager.loader,
             transform: ent.transform,
             visible: ent.visible,
-            hasAuthority: ent.hasAuthority,
-            ...data
+            hasAuthority: ent.hasAuthority
         })
+
+        const metadata = obj.constructor[Symbol.metadata]
+        const serializedProps = metadata?.serializedProps as SerializedMetadataProps | undefined
+        if (serializedProps !== undefined) {
+            for (const [propName, path] of Object.entries(serializedProps)) {
+                const key = propName as keyof T
+                obj[key] = ent.data[path]
+            }
+        }
 
         this._game.addObject(obj)
 

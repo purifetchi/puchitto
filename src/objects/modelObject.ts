@@ -1,16 +1,25 @@
 import { FBXLoader, MTLLoader, OBJLoader } from "three/examples/jsm/Addons.js";
 import { ClampToEdgeWrapping, Group, LoadingManager, Material, Mesh, MeshToonMaterial, Object3DEventMap } from "three";
 import { GameObject } from "./gameObject";
-import { ModelEntityData } from "../level/entities/modelEntityData";
 import { GameObjectOptions } from "./gameObjectOptions";
+import { Serialized } from "../serialization";
 
 /**
  * A model.
  */
-export class ModelObject extends GameObject<ModelEntityData> {
+export class ModelObject extends GameObject {
+    @Serialized("path")
+    accessor path!: string
+
+    @Serialized("transparent")
+    accessor transparent!: boolean
+
+    @Serialized("clamp")
+    accessor clamp!: boolean
+
     private _materials: Record<string, Material> = {}
 
-    private _modelData: GameObjectOptions & ModelEntityData
+    private _loader?: LoadingManager
 
     /**
      * Gets a material by its name
@@ -24,13 +33,18 @@ export class ModelObject extends GameObject<ModelEntityData> {
      * Constructs a new model object.
      * @param opts The options.
      */
-    constructor(opts: GameObjectOptions & ModelEntityData) {
+    constructor(opts: GameObjectOptions) {
         super(opts)
 
-        this._modelData = opts
+        const { loader } = opts
+        this._loader = loader
+    }
 
-        const { path, loader } = opts
-        this._load(path, loader)
+    /**
+     * Called when a serialized property has changed.
+     */
+    onSerializedPropertyChanged(name: string): void {
+        this._load(this.path, this._loader)
     }
 
     /**
@@ -113,8 +127,8 @@ export class ModelObject extends GameObject<ModelEntityData> {
                         lightMapIntensity: mat.lightMapIntensity || 1
                     })
 
-                    toon.transparent = this._modelData.transparent
-                    if (toon.map !== null && this._modelData.clamp) {
+                    toon.transparent = this.transparent
+                    if (toon.map !== null && this.clamp) {
                         toon.map.wrapS = ClampToEdgeWrapping
                         toon.map.wrapT = ClampToEdgeWrapping
                     }

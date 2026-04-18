@@ -44,7 +44,9 @@ export class ModelObject extends GameObject {
      * Called when a serialized property has changed.
      */
     onSerializedPropertyChanged(name: string): void {
-        this._load(this.path, this._loader)
+        if (name === "path" && this.path !== undefined) {
+            this._load(this.path, this._loader)
+        }
     }
 
     /**

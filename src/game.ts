@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 import * as events from "@mary/events";
-import { zeroTransform } from './level/transform';
+import { zeroTransform } from './level/transformData';
 import { InternalPacketTypes } from './networking/packets/internal/internalPacketTypes';
 import { readHelloPacket } from './networking/packets/internal/helloPacket';
 import { writeJoinPacket, type JoinPacket } from './networking/packets/internal/joinPacket';

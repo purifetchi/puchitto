@@ -87,11 +87,6 @@ export class ModelObject extends GameObject<ModelEntityData> {
      * @param data The model data.
      */
     private _setupModel(data: Group<Object3DEventMap>) {
-        const { transform } = this._modelData
-        data.scale.set(transform.scale.x, transform.scale.y, transform.scale.z)
-        data.position.set(transform.position.x, transform.position.y, transform.position.z)
-        data.quaternion.set(transform.rotation.x, transform.rotation.y, transform.rotation.z, transform.rotation.w)
-
         this.threeObject = data
 
         data.traverse(child => {

@@ -22,6 +22,7 @@ type EntityConstructor<T> = new (opts: GameObjectOptions) => T;
  */
 interface EntityDefintionForCreation {
     id: number,
+    type: string,
     name?: string
     tag?: string,
     antics?: AnticsDefinition[],
@@ -76,6 +77,7 @@ export class EntityFactory {
 
         return createFn({
             id: id,
+            type: type,
             name: "New Entity",
             antics: [],
             transform: zeroTransform(),
@@ -98,6 +100,7 @@ export class EntityFactory {
 
         return createFn({
             id: ent.id,
+            type: ent.type,
             name: ent.name,
             tag: ent.tag,
             antics: ent.antics,
@@ -120,6 +123,7 @@ export class EntityFactory {
 
         return createFn({
             id: packet.id,
+            type: packet.entityName,
             transform: {
                 position: packet.position,
                 rotation: packet.rotation,
@@ -143,6 +147,7 @@ export class EntityFactory {
     ): T {
         const obj = new ctor({
             id: ent.id,
+            type: ent.type,
             name: ent.name,
             tag: ent.tag,
             antics: ent.antics,

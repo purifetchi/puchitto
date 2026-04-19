@@ -176,7 +176,6 @@ export abstract class Game {
         this._scene = new THREE.Scene()
         this._camera = new CameraObject({
             id: 0, // The level always begins with id=1, so the camera can be id=0.
-            type: 'camera',
             transform: zeroTransform(),
             tag: 'internal',
             visible: true

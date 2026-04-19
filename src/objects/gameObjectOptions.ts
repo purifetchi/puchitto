@@ -4,7 +4,6 @@ import type { AnticsDefinition } from "./anticsDefinition";
 
 export interface GameObjectOptions {
     id : number,
-    type: string,
     name? : string | undefined,
     tag? : string | undefined,
     hasAuthority? : boolean | undefined,

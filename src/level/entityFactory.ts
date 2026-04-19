@@ -15,14 +15,18 @@ import { jsonTransformToRegularTransform, zeroTransform, type TransformData } fr
 /**
  * Defines the constructor of a game object.
  */
-type EntityConstructor<T> = new (opts: GameObjectOptions) => T;
+type EntityConstructor<T> = new (opts: GameObjectOptions) => T
+
+/**
+ * Defines the type of the unknown entity handler.
+ */
+export type UnknownEntityHandlerType = (opts: GameObjectOptions, type: string, data: Record<string, any>) => GameObject
 
 /**
  * The entity creation definition.
  */
 interface EntityDefintionForCreation {
     id: number,
-    type: string,
     name?: string
     tag?: string,
     antics?: AnticsDefinition[],
@@ -44,19 +48,51 @@ export class EntityFactory {
     /**
      * The map of factories.
      */
-    private _factoryMap: Record<string, (ent: EntityDefintionForCreation) => GameObject> = {
-        "model": (ent: EntityDefintionForCreation) => this._constructFromEntityType<ModelObject>(ModelObject, ent),
-        "light": (ent: EntityDefintionForCreation) => this._constructFromEntityType<LightObject>(LightObject, ent),
-        "audio": (ent: EntityDefintionForCreation) => this._constructFromEntityType<AudioObject>(AudioObject, ent),
-        "marker": (ent: EntityDefintionForCreation) => this._constructFromEntityType<MarkerObject>(MarkerObject, ent),
-        "camera": (ent: EntityDefintionForCreation) => this._constructFromEntityType<CameraObject>(CameraObject, ent)
-    }
+    private _factoryMap: Record<string, (ent: EntityDefintionForCreation) => GameObject> = {}
+
+    /**
+     * The reverse map from the type of the constructor to the internal type.
+     */
+    private _typeMap: Record<string, string> = {}
+
+    /**
+     * Called if we encounter an unknown entity.
+     */
+    private _unknownEntityHandler?: UnknownEntityHandlerType
 
     /**
      * Constructs a new entity factory.
      */
     constructor(game: Game) {
         this._game = game
+        this._registerInternalTypes()
+    }
+
+    /**
+     * Registers internal types.
+     */
+    private _registerInternalTypes() {
+        this.registerEntity<ModelObject>("model", ModelObject)
+        this.registerEntity<LightObject>("light", LightObject)
+        this.registerEntity<AudioObject>("audio", AudioObject)
+        this.registerEntity<MarkerObject>("marker", MarkerObject)
+        this.registerEntity<CameraObject>("camera", CameraObject)
+    }
+
+    /**
+     * Resolves the type for a given GameObject.
+     * @param obj The game object.
+     */
+    resolveType(obj: GameObject): string | undefined {
+        return this._typeMap[obj.constructor.name]
+    }
+
+    /**
+     * Registers a handler to run when creating an entity we do not know about.
+     * @param handler The handler.
+     */
+    registerUnknownEntityHandler(handler: UnknownEntityHandlerType) {
+        this._unknownEntityHandler = handler
     }
 
     /**
@@ -66,24 +102,33 @@ export class EntityFactory {
      */
     registerEntity<T extends GameObject>(type: string, ctor: EntityConstructor<T>) {
         this._factoryMap[type] = (ent) => this._constructFromEntityType<T>(ctor, ent)
+        this._typeMap[ctor.name] = type
+
+        console.log(this._typeMap)
     }
 
     create<T extends GameObject>(type: string, id: number, data: Record<string, any>): T | undefined {
-        const createFn = this._factoryMap[type]
-        if (createFn === undefined) {
-            console.error(`[EntityFactory::createFromLevelDefinition] Could not find create function for entity type ${type}.`)
-            return
-        }
-
-        return createFn({
+        const definition = {
             id: id,
-            type: type,
             name: "New Entity",
             antics: [],
             transform: zeroTransform(),
             visible: true,
             data: data
-        }) as T
+        }
+
+        const createFn = this._factoryMap[type]
+        if (createFn === undefined) {
+            const maybeUnknownEntity = this._constructUnknownEntity(definition, type)
+            if (maybeUnknownEntity !== undefined) {
+                return maybeUnknownEntity as T
+            }
+
+            console.error(`[EntityFactory::createFromLevelDefinition] Could not find create function for entity type ${type}.`)
+            return
+        }
+
+        return createFn(definition) as T
     }
 
     /**
@@ -92,22 +137,28 @@ export class EntityFactory {
      * @returns The game object.
      */
     createFromLevelDefinition(ent: LevelEntityDefinition): GameObject | undefined {
-        const createFn = this._factoryMap[ent.type]
-        if (createFn === undefined) {
-            console.error(`[EntityFactory::createFromLevelDefinition] Could not find create function for entity type ${ent.type}.`)
-            return
-        }
-
-        return createFn({
+        const definition = {
             id: ent.id,
-            type: ent.type,
             name: ent.name,
             tag: ent.tag,
             antics: ent.antics,
             transform: jsonTransformToRegularTransform(ent.transform),
             visible: ent.visible,
             data: ent.data
-        })
+        }
+
+        const createFn = this._factoryMap[ent.type]
+        if (createFn === undefined) {
+            const maybeUnknownEntity = this._constructUnknownEntity(definition, ent.type)
+            if (maybeUnknownEntity !== undefined) {
+                return maybeUnknownEntity
+            }
+
+            console.error(`[EntityFactory::createFromLevelDefinition] Could not find create function for entity type ${ent.type}.`)
+            return
+        }
+
+        return createFn(definition)
     }
 
     /**
@@ -115,15 +166,8 @@ export class EntityFactory {
      * @param packet The packet.
      */
     createFromCreateEntityPacket(packet: CreateEntityPacket): GameObject | undefined {
-        const createFn = this._factoryMap[packet.entityName]
-        if (createFn === undefined) {
-            console.error(`[EntityFactory::createFromLevelDefinition] Could not find create function for entity type ${packet.entityName}.`)
-            return
-        }
-
-        return createFn({
+        const definition = {
             id: packet.id,
-            type: packet.entityName,
             transform: {
                 position: packet.position,
                 rotation: packet.rotation,
@@ -132,7 +176,47 @@ export class EntityFactory {
             hasAuthority: packet.isOwner,
             visible: true,
             data: JSON.parse(packet.jsonEntityData)
-        })
+        }
+
+        const createFn = this._factoryMap[packet.entityName]
+        if (createFn === undefined) {
+            const maybeUnknownEntity = this._constructUnknownEntity(definition, packet.entityName)
+            if (maybeUnknownEntity !== undefined) {
+                return maybeUnknownEntity
+            }
+
+            console.error(`[EntityFactory::createFromLevelDefinition] Could not find create function for entity type ${packet.entityName}.`)
+            return
+        }
+
+        return createFn(definition)
+    }
+
+    /**
+     * Constructs an unknown entity.
+     * @param ent The entity.
+     */
+    private _constructUnknownEntity(
+        ent: EntityDefintionForCreation,
+        type: string
+    ): GameObject | undefined {
+        if (this._unknownEntityHandler === undefined) {
+            return undefined
+        }
+
+        const obj = this._unknownEntityHandler({
+            id: ent.id,
+            name: ent.name,
+            tag: ent.tag,
+            antics: ent.antics,
+            loader: this._game._dataManager.loader,
+            transform: ent.transform,
+            visible: ent.visible,
+            hasAuthority: ent.hasAuthority
+        }, type, ent.data)
+
+        this._game.addObject(obj)
+        return obj
     }
 
     /**
@@ -147,7 +231,6 @@ export class EntityFactory {
     ): T {
         const obj = new ctor({
             id: ent.id,
-            type: ent.type,
             name: ent.name,
             tag: ent.tag,
             antics: ent.antics,

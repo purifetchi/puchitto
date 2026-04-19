@@ -54,12 +54,6 @@ export abstract class GameObject {
     attached : boolean = false
 
     /**
-     * The internal type of this object.
-     * TODO: Remove this, for now I've no better idea where to store it.
-     */
-    readonly internalType: string
-
-    /**
      * The transform of this object.
      */
     readonly transform : Transform
@@ -100,7 +94,6 @@ export abstract class GameObject {
         this.transform.scale = opts.transform.scale
 
         this.id = opts.id
-        this.internalType = opts.type
 
         this.name = opts?.name
         this.tag = opts?.tag

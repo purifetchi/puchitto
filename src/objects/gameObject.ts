@@ -16,7 +16,7 @@ export abstract class GameObject {
     /**
      * The ID of this game object.
      */
-    id : number
+    readonly id : number
 
     /**
      * The name of this game object.
@@ -34,7 +34,7 @@ export abstract class GameObject {
     threeObject! : Object3D
 
     /**
-     *
+     * The game this object is attached to.
      */
     game! : Game
 
@@ -52,6 +52,12 @@ export abstract class GameObject {
      * Is the current object attached.
      */
     attached : boolean = false
+
+    /**
+     * The internal type of this object.
+     * TODO: Remove this, for now I've no better idea where to store it.
+     */
+    readonly internalType: string
 
     /**
      * The transform of this object.
@@ -93,7 +99,9 @@ export abstract class GameObject {
         this.transform.rotation = opts.transform.rotation
         this.transform.scale = opts.transform.scale
 
-        this.id = opts?.id
+        this.id = opts.id
+        this.internalType = opts.type
+
         this.name = opts?.name
         this.tag = opts?.tag
         this.hasAuthority = opts?.hasAuthority ?? false

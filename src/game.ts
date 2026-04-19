@@ -109,6 +109,11 @@ export abstract class Game {
     private _gameSystems: GameSystem[] = []
 
     /**
+     * The resize observer for the parent DOM element.
+     */
+    private _resizeObserver!: ResizeObserver
+
+    /**
      * An event stream for objects to subscribe to.
      */
     eventStream = new events.EventEmitter<{
@@ -220,7 +225,10 @@ export abstract class Game {
         this.registerCustomEntities(this._entityFactory)
 
         this._addDefaultEventStreamListeners()
-        window.addEventListener('resize', this._resize.bind(this))
+        this._resizeObserver = new ResizeObserver(() => {
+            this._resize()
+        })
+        this._resizeObserver.observe(this._parentElement)
 
         this.registerCustomGameSystems()
         this.createScene()

@@ -23,14 +23,33 @@ export class CameraObject extends GameObject {
     accessor type: "ortographic" | "perspective" | undefined
 
     /**
+     * The near clipping plane.
+     */
+    @Serialized("near")
+    accessor near: number = 0.1
+
+    /**
+     * The far clipping plane.
+     */
+    @Serialized("far")
+    accessor far: number = 1000
+
+    /**
+     * The FOV of the perspective camera.
+     */
+    @Serialized("fov")
+    accessor fov: number = 90
+
+    /**
+     * The zoom of the ortographic camera.
+     */
+    @Serialized("zoom")
+    accessor zoom: number = 6
+
+    /**
      * The audio listener.
      */
     listener!: AudioListener
-
-    /**
-     * The zoom level.
-     */
-    private _zoom = 6
 
     /**
      * The THREE camera.
@@ -51,6 +70,14 @@ export class CameraObject extends GameObject {
         this.threeObject = this._camera
     }
 
+    onSerializedPropertyChanged(name: string): void {
+        if (this.camera instanceof PerspectiveCamera) {
+            this.camera.fov = this.fov
+            this.camera.near = this.near
+            this.camera.far = this.far
+        }
+    }
+
     /**
      * Resizes the camera's aspect ratio.
      * @param width The width of the viewport.
@@ -61,10 +88,10 @@ export class CameraObject extends GameObject {
 
         if (this._camera instanceof OrthographicCamera)
         {
-            this._camera.left = -this._zoom * aspect
-            this._camera.right = this._zoom * aspect
-            this._camera.top = this._zoom
-            this._camera.bottom = -this._zoom
+            this._camera.left = -this.zoom * aspect
+            this._camera.right = this.zoom * aspect
+            this._camera.top = this.zoom
+            this._camera.bottom = -this.zoom
             this._camera.updateProjectionMatrix()
         }
         else if (this._camera instanceof PerspectiveCamera)
@@ -89,11 +116,11 @@ export class CameraObject extends GameObject {
 
         if (this.type === "perspective")
         {
-            return new PerspectiveCamera(90, aspect, 0.1, 1000)
+            return new PerspectiveCamera(this.fov, aspect, this.near, this.far)
         }
 
         return new OrthographicCamera(
-            -this._zoom * aspect, this._zoom * aspect, this._zoom, -this._zoom, -10, 1000
+            -this.zoom * aspect, this.zoom * aspect, this.zoom, -this.zoom, this.near, this.far
         )
     }
 }

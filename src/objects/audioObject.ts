@@ -85,7 +85,7 @@ export class AudioObject extends GameObject {
             audio.setVolume(this.volume)
             audio.setLoop(this.looping)
 
-            this.threeObject = audio
+            this._setThreeObject(audio)
             this._attach()
 
             if (this.autoplay) {

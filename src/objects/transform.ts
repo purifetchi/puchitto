@@ -1,4 +1,4 @@
-import { Quaternion, Vector3 } from "three";
+import { Object3D, Quaternion, Vector3 } from "three";
 import { GameObject } from "./gameObject";
 
 /**
@@ -111,5 +111,15 @@ export class Transform {
         this._storedPosition = undefined
         this._storedRotation = undefined
         this._storedScale = undefined
+    }
+
+    /**
+     * Copies transform from a three.js object.
+     * @param object The object to copy from.
+     */
+    copyFromThreeObject(object: Object3D) {
+        this.position = object.position
+        this.rotation = object.quaternion
+        this.scale = object.scale
     }
 }

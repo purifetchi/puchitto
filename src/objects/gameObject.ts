@@ -242,6 +242,26 @@ export abstract class GameObject {
     }
 
     /**
+     * Swaps one three.js object for another.
+     * @param object The new three object.
+     */
+    protected _setThreeObject(object: Object3D): void {
+        if (this.threeObject === undefined) {
+            this.threeObject = object
+            return
+        }
+
+        this.game._scene.remove(this.threeObject)
+
+        // Hack: For a split second set the three object to null to copy the transform.
+        const prev = this.threeObject
+        this.threeObject = undefined!
+        this.transform.copyFromThreeObject(prev)
+
+        this.threeObject = object
+    }
+
+    /**
      * Sets whether this object is visible.
      * @param isVisible Is this object visible.
      */

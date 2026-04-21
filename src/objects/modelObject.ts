@@ -103,7 +103,7 @@ export class ModelObject extends GameObject {
      * @param data The model data.
      */
     private _setupModel(data: Group<Object3DEventMap>) {
-        this.threeObject = data
+        this._setThreeObject(data)
 
         data.traverse(child => {
             if (child instanceof Mesh) {

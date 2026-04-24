@@ -10,7 +10,7 @@ import { MarkerObject } from "../objects/markerObject";
 import { ModelObject } from "../objects/modelObject";
 import { SerializedMetadataProps } from "../serialization";
 import { LevelEntityDefinition } from "./levelEntityDefinition";
-import { jsonTransformToRegularTransform, zeroTransform, type TransformData } from "./transformData";
+import { jsonTransformToRegularTransform, unityJsonTransformToRegularTransform, zeroTransform, type TransformData } from "./transformData";
 
 /**
  * Defines the constructor of a game object.
@@ -134,15 +134,23 @@ export class EntityFactory {
     /**
      * Creates an entity from the level definition.
      * @param ent The entity definition.
+     * @param version The level definition version.
      * @returns The game object.
      */
-    createFromLevelDefinition(ent: LevelEntityDefinition): GameObject | undefined {
+    createFromLevelDefinition(ent: LevelEntityDefinition, version: number = 1): GameObject | undefined {
+        let transform: TransformData
+        if (version < 2) {
+            transform = unityJsonTransformToRegularTransform(ent.transform)
+        } else {
+            transform = jsonTransformToRegularTransform(ent.transform)
+        }
+
         const definition = {
             id: ent.id,
             name: ent.name,
             tag: ent.tag,
             antics: ent.antics,
-            transform: jsonTransformToRegularTransform(ent.transform),
+            transform: transform,
             visible: ent.visible,
             data: ent.data
         }

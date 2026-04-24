@@ -1,4 +1,3 @@
-import { Object3D } from "three";
 import { GameObject } from "./gameObject";
 import { GameObjectOptions } from "./gameObjectOptions";
 
@@ -8,11 +7,5 @@ import { GameObjectOptions } from "./gameObjectOptions";
 export class MarkerObject extends GameObject {
     constructor(opts: GameObjectOptions) {
         super(opts)
-
-        this.threeObject = new Object3D()
-    }
-
-    onSceneAdded(): void {
-        this._attach()
     }
 }

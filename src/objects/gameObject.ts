@@ -1,4 +1,4 @@
-import type { Object3D } from "three"
+import { Group, type Object3D } from "three"
 import { EventEmitter } from "@mary/events"
 import type { AnticsDefinition, AnticsOn } from "./anticsDefinition"
 import { Game } from "../game"
@@ -29,11 +29,6 @@ export abstract class GameObject {
     tag?: string | undefined
 
     /**
-     * The underlying THREE object.
-     */
-    threeObject! : Object3D
-
-    /**
      * The game this object is attached to.
      */
     game! : Game
@@ -59,10 +54,16 @@ export abstract class GameObject {
     readonly transform : Transform
 
     /**
+     * The underlying THREE object.
+     */
+    readonly threeObject : Object3D
+
+    /**
      * The event stream for this object.
      */
     eventStream = new EventEmitter<{
-        attached: []
+        attached: [],
+        loadedAssets: []
     }>()
 
     /**
@@ -88,12 +89,15 @@ export abstract class GameObject {
             throw new Error("Tried to create a new game object without an ID!!!")
         }
 
+        this.id = opts.id
+
+        this.threeObject = new Group()
+        this.threeObject.name = `GameObject:${this.id}`
+
         this.transform = new Transform(this)
         this.transform.position = opts.transform.position
         this.transform.rotation = opts.transform.rotation
         this.transform.scale = opts.transform.scale
-
-        this.id = opts.id
 
         this.name = opts?.name
         this.tag = opts?.tag
@@ -103,6 +107,23 @@ export abstract class GameObject {
         this._objectAntics = this._parseAntics(opts?.antics)
 
         console.log(`[GameObject::constructor] Constructed object ${this.name} with id ${this.id} and authority ${this.hasAuthority}`)
+    }
+
+    /**
+     * Attaches a THREE.js object to this gameobject.
+     * @param obj The THREE.js object to attach.
+     */
+    protected attachThreeObject(obj: Object3D) {
+        this.threeObject.add(obj)
+    }
+
+    /**
+     * Clears all of the attachments.
+     */
+    protected clearAttachments() {
+        for (const child of [...this.threeObject.children]) {
+            this.threeObject.remove(child)
+        }
     }
 
     /**
@@ -225,12 +246,11 @@ export abstract class GameObject {
     /**
      * Attaches this object to the THREE scene.
      */
-    protected _attach() : void {
+    private _attachToScene() : void {
         this.attached = true
         this.threeObject.userData["id"] = this.id
         this.threeObject.userData["clickable"] = this.clickable
 
-        this.transform.bind()
         this.setVisible(this._visible)
 
         this.game._scene.add(this.threeObject)
@@ -239,26 +259,6 @@ export abstract class GameObject {
         this.game.eventStream.emit('objectAttached', this)
 
         this.runAntics("attach")
-    }
-
-    /**
-     * Swaps one three.js object for another.
-     * @param object The new three object.
-     */
-    protected _setThreeObject(object: Object3D): void {
-        if (this.threeObject === undefined) {
-            this.threeObject = object
-            return
-        }
-
-        this.game._scene.remove(this.threeObject)
-
-        // Hack: For a split second set the three object to null to copy the transform.
-        const prev = this.threeObject
-        this.threeObject = undefined!
-        this.transform.copyFromThreeObject(prev)
-
-        this.threeObject = object
     }
 
     /**
@@ -292,6 +292,8 @@ export abstract class GameObject {
         this.game = game
         this._setupMiniAntics()
         this.onGameSet()
+
+        this._attachToScene()
     }
 
     /**

@@ -67,7 +67,7 @@ export class CameraObject extends GameObject {
         this.listener = new AudioListener()
         this._camera.attach(this.listener)
 
-        this.threeObject = this._camera
+        this.attachThreeObject(this._camera)
     }
 
     onSerializedPropertyChanged(name: string): void {

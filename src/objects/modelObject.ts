@@ -103,8 +103,6 @@ export class ModelObject extends GameObject {
      * @param data The model data.
      */
     private _setupModel(data: Group<Object3DEventMap>) {
-        this._setThreeObject(data)
-
         data.traverse(child => {
             if (child instanceof Mesh) {
                 const wasArray = Array.isArray(child.material)
@@ -146,6 +144,7 @@ export class ModelObject extends GameObject {
             }
         })
 
-        this._attach()
+        this.clearAttachments()
+        this.attachThreeObject(data)
     }
 }

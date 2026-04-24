@@ -37,7 +37,7 @@ export class LightObject extends GameObject {
         super(opts)
 
         this._light = new PointLight()
-        this.threeObject = this._light
+        this.attachThreeObject(this._light)
     }
 
     /**
@@ -47,12 +47,5 @@ export class LightObject extends GameObject {
         this._light.color = new Color(this.color[0], this.color[1], this.color[2])
         this._light.intensity = this.intensity * 50
         this._light.distance = this.range
-    }
-
-    /**
-     * Called when the object is added to the scene.
-     */
-    onSceneAdded(): void {
-        this._attach()
     }
 }

@@ -1,4 +1,4 @@
-import { Object3D, Quaternion, Vector3 } from "three";
+import { Quaternion, Vector3 } from "three";
 import { GameObject } from "./gameObject";
 
 /**
@@ -9,21 +9,6 @@ export class Transform {
      * The gameobject for this transform.
      */
     private _obj : GameObject
-
-    /**
-     * The stored position for later binding.
-     */
-    private _storedPosition? : Vector3
-
-    /**
-     * The stored scale for later binding.
-     */
-    private _storedScale? : Vector3
-
-    /**
-     * The stored rotation for later binding.
-     */
-    private _storedRotation? : Quaternion
 
     /**
      * Constructs a new transform.
@@ -37,18 +22,13 @@ export class Transform {
      * Gets the position of this object.
      */
     get position() {
-        return this._obj.threeObject?.position ?? this._storedPosition
+        return this._obj.threeObject.position
     }
 
     /**
      * Sets the position of this object.
      */
     set position(vec: Vector3) {
-        if (this._obj.threeObject === undefined) {
-            this._storedPosition = vec
-            return
-        }
-
         this._obj.threeObject.position.copy(vec)
     }
 
@@ -56,18 +36,13 @@ export class Transform {
      * Gets the quaternion rotation of this object.
      */
     get rotation() {
-        return this._obj.threeObject?.quaternion ?? this._storedRotation
+        return this._obj.threeObject.quaternion
     }
 
     /**
      * Sets the quaternion rotation of this object.
      */
     set rotation(quat: Quaternion) {
-        if (this._obj.threeObject === undefined) {
-            this._storedRotation = quat
-            return
-        }
-
         this._obj.threeObject.quaternion.copy(quat)
     }
 
@@ -75,51 +50,13 @@ export class Transform {
      * Gets the scale of this object.
      */
     get scale() {
-        return this._obj.threeObject?.scale ?? this._storedScale
+        return this._obj.threeObject.scale
     }
 
     /**
      * Sets the position of this object.
      */
     set scale(vec: Vector3) {
-        if (this._obj.threeObject === undefined) {
-            this._storedScale = vec
-            return
-        }
-
         this._obj.threeObject.scale.copy(vec)
-    }
-
-    /**
-     * Binds the transform to the gameobject.
-     */
-    bind() {
-        console.log(`[Transform::bind] Binding ${this._obj.name} with ${this._storedPosition} ${this._storedRotation} ${this._storedScale}`)
-
-        if (this._storedPosition !== undefined) {
-            this._obj.threeObject.position.copy(this._storedPosition)
-        }
-
-        if (this._storedRotation !== undefined) {
-            this._obj.threeObject.quaternion.copy(this._storedRotation)
-        }
-
-        if (this._storedScale) {
-            this._obj.threeObject.scale.copy(this._storedScale)
-        }
-
-        this._storedPosition = undefined
-        this._storedRotation = undefined
-        this._storedScale = undefined
-    }
-
-    /**
-     * Copies transform from a three.js object.
-     * @param object The object to copy from.
-     */
-    copyFromThreeObject(object: Object3D) {
-        this.position = object.position
-        this.rotation = object.quaternion
-        this.scale = object.scale
     }
 }

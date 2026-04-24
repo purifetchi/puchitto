@@ -7,6 +7,11 @@ import { tokenize } from "./tokenizer";
  */
 export class MiniAnticsScript {
     /**
+     * The source string.
+     */
+    readonly source: string
+
+    /**
      * The expression.
      */
     private _expression: Expression
@@ -25,6 +30,7 @@ export class MiniAnticsScript {
      */
     constructor(code: string) {
         const tokens = tokenize(code)
+        this.source = code
         this._expression = parse(tokens)
 
         console.log(this._expression)

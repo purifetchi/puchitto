@@ -54,7 +54,7 @@ export class GameLoader {
         this._awaitedEntities = this._totalEntities
 
         for (const ent of level.ents) {
-            const createdEntity = this._game._entityFactory.createFromLevelDefinition(ent)
+            const createdEntity = this._game._entityFactory.createFromLevelDefinition(ent, level.version ?? 1)
             if (createdEntity !== undefined && !createdEntity.attached) {
                 const cleanup = createdEntity.eventStream.on("attached", () => {
                     this._tickOneLoadedEntity()

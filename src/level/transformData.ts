@@ -23,11 +23,11 @@ export function zeroTransform() : TransformData {
 }
 
 /**
- * Transforms a JSON-based transform into a regular transform.
+ * Transforms a JSON-based unity transform into a regular transform.
  * @param json The JSON transform.
  * @returns The regular transform.
  */
-export function jsonTransformToRegularTransform(json: JsonTransform): TransformData {
+export function unityJsonTransformToRegularTransform(json: JsonTransform): TransformData {
     return {
         position: new Vector3(
             json.position[0],
@@ -37,6 +37,32 @@ export function jsonTransformToRegularTransform(json: JsonTransform): TransformD
         rotation: new Quaternion(
             -json.rotation[0],
             -json.rotation[1],
+            json.rotation[2],
+            json.rotation[3]
+        ),
+        scale: new Vector3(
+            json.scale[0],
+            json.scale[1],
+            json.scale[2]
+        )
+    };
+}
+
+/**
+ * Transforms a JSON-based regular transform into a regular transform.
+ * @param json The JSON transform.
+ * @returns The regular transform.
+ */
+export function jsonTransformToRegularTransform(json: JsonTransform): TransformData {
+    return {
+        position: new Vector3(
+            json.position[0],
+            json.position[1],
+            json.position[2]
+        ),
+        rotation: new Quaternion(
+            json.rotation[0],
+            json.rotation[1],
             json.rotation[2],
             json.rotation[3]
         ),

@@ -44,11 +44,6 @@ export abstract class GameObject {
     clickable : boolean = false
 
     /**
-     * Is the current object attached.
-     */
-    attached : boolean = false
-
-    /**
      * The transform of this object.
      */
     readonly transform : Transform
@@ -247,7 +242,6 @@ export abstract class GameObject {
      * Attaches this object to the THREE scene.
      */
     private _attachToScene() : void {
-        this.attached = true
         this.threeObject.userData["id"] = this.id
         this.threeObject.userData["clickable"] = this.clickable
 

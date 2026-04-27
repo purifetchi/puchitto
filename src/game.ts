@@ -59,21 +59,6 @@ export abstract class Game {
     _objects : GameObject[] = []
 
     /**
-     * The tweens within this scene.
-     */
-    _tweens : TweenContract[] = []
-
-    /**
-     * The raycaster.
-     */
-    _raycaster! : THREE.Raycaster
-
-    /**
-     * The input class.
-     */
-    _input! : Input
-
-    /**
      * The entity factory.
      */
     _entityFactory! : EntityFactory
@@ -87,6 +72,21 @@ export abstract class Game {
      * The WebSocket listener.
      */
     _networkManager! : NetworkManager
+
+    /**
+     * The tweens within this scene.
+     */
+    private _tweens : TweenContract[] = []
+
+    /**
+     * The raycaster.
+     */
+    private _raycaster! : THREE.Raycaster
+
+    /**
+     * The input class.
+     */
+    private _input! : Input
 
     /**
      * The base MiniAntics environment.
@@ -112,6 +112,11 @@ export abstract class Game {
      * The resize observer for the parent DOM element.
      */
     private _resizeObserver!: ResizeObserver
+
+    /**
+     * A helper map from IDs to the given game objects.
+     */
+    private _objectIdMap: Map<number, GameObject> = new Map<number, GameObject>()
 
     /**
      * An event stream for objects to subscribe to.
@@ -171,6 +176,7 @@ export abstract class Game {
         }
 
         this._objects = []
+        this._objectIdMap.clear()
 
         const res = this._getResolution()
         this._scene = new THREE.Scene()
@@ -338,13 +344,9 @@ export abstract class Game {
             return
         }
 
-        this._objects = [ ...this._objects, object ]
+        this._objects.push(object)
+        this._objectIdMap.set(object.id, object)
         object.setGame(this)
-
-        if (object.threeObject !== undefined) {
-            this._scene.add(object.threeObject)
-        }
-
         object.onSceneAdded()
 
         return object
@@ -355,8 +357,7 @@ export abstract class Game {
      * @param id The ID.
      */
     getObjectById(id: number) : GameObject | undefined {
-        const obj = this._objects.find(o => o.id == id)
-        return obj
+        return this._objectIdMap.get(id)
     }
 
     /**
@@ -374,6 +375,8 @@ export abstract class Game {
      */
     removeObject(object : GameObject) : void {
         this._objects = this._objects.filter(o => o.id != object.id)
+        this._objectIdMap.delete(object.id)
+
         this._scene.remove(object.threeObject)
 
         this.eventStream.emit("objectRemoved", object)

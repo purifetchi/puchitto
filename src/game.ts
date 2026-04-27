@@ -39,21 +39,6 @@ export abstract class Game {
     _camera! : CameraObject
 
     /**
-     * The renderer responsible for rendering the scene.
-     */
-    _renderer! : THREE.WebGLRenderer
-
-    /**
-     * The CSS3D renderer. (TODO: This should be opt-in.)
-     */
-    _css3D!: CSS3DRenderer
-
-    /**
-     * The clock used for getting the delta time.
-     */
-    _clock! : THREE.Clock
-
-    /**
      * The objects within this scene.
      */
     _objects : GameObject[] = []
@@ -72,6 +57,21 @@ export abstract class Game {
      * The WebSocket listener.
      */
     _networkManager! : NetworkManager
+
+    /**
+     * The renderer responsible for rendering the scene.
+     */
+    private _renderer! : THREE.WebGLRenderer
+
+    /**
+     * The CSS3D renderer. (TODO: This should be opt-in.)
+     */
+    private _css3D!: CSS3DRenderer
+
+    /**
+     * The clock used for getting the delta time.
+     */
+    private _clock! : THREE.Clock
 
     /**
      * The tweens within this scene.

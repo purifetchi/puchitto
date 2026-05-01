@@ -32,8 +32,6 @@ export class MiniAnticsScript {
         const tokens = tokenize(code)
         this.source = code
         this._expression = parse(tokens)
-
-        console.log(this._expression)
     }
 
     /**

@@ -103,8 +103,6 @@ export class EntityFactory {
     registerEntity<T extends GameObject>(type: string, ctor: EntityConstructor<T>) {
         this._factoryMap[type] = (ent) => this._constructFromEntityType<T>(ctor, ent)
         this._typeMap[ctor.name] = type
-
-        console.log(this._typeMap)
     }
 
     create<T extends GameObject>(type: string, id: number, data: Record<string, any>): T | undefined {

@@ -138,8 +138,8 @@ export class NetworkManager {
      * @param opCode The packet's OpCode.
      */
     private _writePacketEnvelope(nw: NetworkWriter, opCode: number) {
-        const seq = Atomics.add(this._seq, 0, 1)
-        nw.writeInt32(seq)
+        this._seq[0]++
+        nw.writeInt32(this._seq[0])
         nw.writeInt32(opCode)
         nw.writeInt32(0)
     }

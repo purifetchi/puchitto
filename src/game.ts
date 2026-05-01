@@ -385,17 +385,25 @@ export abstract class Game {
     }
 
     /**
+     * Gets the NDC pointer position.
+     * TODO: Should this be here?
+     */
+    getNdcPosition() {
+        const res = this._getResolution()
+        const rect = this._parentElement.getBoundingClientRect()
+
+        return new THREE.Vector2(
+            ((this.input.pointerPosition.x - rect.left) / res.x) * 2 - 1,
+            -((this.input.pointerPosition.y - rect.top) / res.y) * 2 + 1
+        )
+    }
+
+    /**
      * Casts a ray into the scene and gets the objects that have been intersected with.
      * @returns The list of intersected objects
      */
     raycast() : THREE.Intersection[] {
-        const res = this._getResolution()
-        const rect = this._parentElement.getBoundingClientRect()
-
-        const pointer = new THREE.Vector2(
-            ((this.input.pointerPosition.x - rect.left) / res.x) * 2 - 1,
-            -((this.input.pointerPosition.y - rect.top) / res.y) * 2 + 1
-        )
+        const pointer = this.getNdcPosition()
 
         this._raycaster.setFromCamera(
             pointer,

@@ -34,10 +34,10 @@ export class GameLoader {
      * Loads a level from the ALF path.
      * @param path The path.
      */
-    async load() {
+    async load(path: string = "/level.json") {
         this._game.eventStream.emit("loading", 0)
 
-        const jsonString = await this._game._dataManager.getStringData("/level.json")
+        const jsonString = await this._game._dataManager.getStringData(path)
         const level = JSON.parse(jsonString) as Level
 
         this._loadLevel(level)

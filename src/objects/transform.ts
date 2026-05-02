@@ -1,4 +1,4 @@
-import { Quaternion, Vector3 } from "three";
+import { Euler, Quaternion, Vector3 } from "three";
 import { GameObject } from "./gameObject";
 
 /**
@@ -44,6 +44,20 @@ export class Transform {
      */
     set rotation(quat: Quaternion) {
         this._obj.threeObject.quaternion.copy(quat)
+    }
+
+    /**
+     * Gets the euler angles of this object.
+     */
+    get euler() {
+        return this._obj.threeObject.rotation
+    }
+
+    /**
+     * Sets the euler angles of this object.
+     */
+    set euler(euler: Euler) {
+        this._obj.threeObject.rotation.copy(euler)
     }
 
     /**

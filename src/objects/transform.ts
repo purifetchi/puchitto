@@ -73,4 +73,12 @@ export class Transform {
     set scale(vec: Vector3) {
         this._obj.threeObject.scale.copy(vec)
     }
+
+    /**
+     * Sets a uniform scale.
+     * @param size The size of the scale.
+     */
+    setUniformScale(size: number) {
+        this.scale.set(size, size, size)
+    }
 }

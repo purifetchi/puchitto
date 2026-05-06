@@ -13,7 +13,8 @@ export default defineConfig({
         level: 'src/level/index.ts',
         helpers: 'src/helpers/index.ts',
         systems: 'src/systems/index.ts',
-        serialization: 'src/serialization/index.ts'
+        serialization: 'src/serialization/index.ts',
+        mixins: 'src/objects/mixins/index.ts'
     },
     format: ['esm'],
     dts: true,

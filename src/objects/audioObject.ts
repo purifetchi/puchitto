@@ -3,11 +3,12 @@ import { GameObject } from "./gameObject";
 import { GameObjectOptions } from "./gameObjectOptions";
 import { MiniAnticsEnvironment } from "../scripting";
 import { Serialized } from "../serialization";
+import { AssetLoading } from "./mixins/assetLoading";
 
 /**
  * The audio playback object.
  */
-export class AudioObject extends GameObject {
+export class AudioObject extends AssetLoading(GameObject) {
     /**
      * The path to the audio data.
      */
@@ -39,23 +40,9 @@ export class AudioObject extends GameObject {
     accessor volume!: number
 
     /**
-     * The data loader.
-     */
-    private _loader? : LoadingManager
-
-    /**
      * The audio.
      */
     private _audio? : Audio<any>
-
-    /**
-     * Constructs a new Audio playback object.
-     * @param opts The options.
-     */
-    constructor(opts: GameObjectOptions) {
-        super(opts)
-        this._loader = opts.loader
-    }
 
     /**
      * Sets up the custom MiniAntics method for the audio entity.
@@ -79,13 +66,16 @@ export class AudioObject extends GameObject {
             ? new PositionalAudio(this.game._camera.listener)
             : new Audio(this.game._camera.listener)
 
-        const loader = new AudioLoader(this._loader)
+        this.beginAssetLoad()
+
+        const loader = new AudioLoader(this.loader)
         loader.load(this.path, (data) => {
             audio.setBuffer(data)
             audio.setVolume(this.volume)
             audio.setLoop(this.looping)
 
             this.attachThreeObject(audio)
+            this.finishAssetLoad()
 
             if (this.autoplay) {
                 audio.play()

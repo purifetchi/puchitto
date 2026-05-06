@@ -12,7 +12,7 @@ import { Transform } from "./transform"
 /**
  * The base game object.
  */
-export abstract class GameObject {
+export class GameObject {
     /**
      * The ID of this game object.
      */

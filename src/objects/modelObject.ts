@@ -1,13 +1,13 @@
 import { FBXLoader, MTLLoader, OBJLoader } from "three/examples/jsm/Addons.js";
 import { ClampToEdgeWrapping, Group, LoadingManager, Material, Mesh, MeshToonMaterial, Object3DEventMap } from "three";
 import { GameObject } from "./gameObject";
-import { GameObjectOptions } from "./gameObjectOptions";
 import { Serialized } from "../serialization";
+import { AssetLoading } from "./mixins/assetLoading";
 
 /**
  * A model.
  */
-export class ModelObject extends GameObject {
+export class ModelObject extends AssetLoading(GameObject) {
     @Serialized("path")
     accessor path!: string
 
@@ -19,8 +19,6 @@ export class ModelObject extends GameObject {
 
     private _materials: Record<string, Material> = {}
 
-    private _loader?: LoadingManager
-
     /**
      * Gets a material by its name
      * @param name The name of the material
@@ -30,22 +28,11 @@ export class ModelObject extends GameObject {
     }
 
     /**
-     * Constructs a new model object.
-     * @param opts The options.
-     */
-    constructor(opts: GameObjectOptions) {
-        super(opts)
-
-        const { loader } = opts
-        this._loader = loader
-    }
-
-    /**
      * Called when a serialized property has changed.
      */
     onSerializedPropertyChanged(name: string): void {
         if (name === "path" && this.path !== undefined) {
-            this._load(this.path, this._loader)
+            this._load(this.path, this.loader)
         }
     }
 
@@ -78,6 +65,8 @@ export class ModelObject extends GameObject {
      * @param loader The asset loader.
      */
     private _loadObj(path: string, loader: LoadingManager | undefined) {
+        this.beginAssetLoad()
+
         const objLoader = new OBJLoader(loader)
         const mtlLoader = new MTLLoader(loader)
 
@@ -94,6 +83,8 @@ export class ModelObject extends GameObject {
      * @param loader The asset loader.
      */
     private _loadFbx(path: string, loader: LoadingManager | undefined) {
+        this.beginAssetLoad()
+
         const fbxLoader = new FBXLoader(loader)
         fbxLoader.load(path, data => this._setupModel(data))
     }
@@ -146,5 +137,7 @@ export class ModelObject extends GameObject {
 
         this.clearAttachments()
         this.attachThreeObject(data)
+
+        this.finishAssetLoad()
     }
 }

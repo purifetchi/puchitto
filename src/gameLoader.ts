@@ -56,8 +56,14 @@ export class GameLoader {
         for (const ent of level.ents) {
             const createdEntity = this._game._entityFactory.createFromLevelDefinition(ent, level.version ?? 1)
             if (createdEntity !== undefined) {
-                // TODO: Fix waiting for assets after attaching changes.
-                this._tickOneLoadedEntity()
+                if ('IS_ASSET_LOADING' in createdEntity) {
+                    const unlink = createdEntity.eventStream.on('loadedAssets', () => {
+                        this._tickOneLoadedEntity()
+                        unlink()
+                    })
+                } else {
+                    this._tickOneLoadedEntity()
+                }
             }
         }
     }

@@ -33,6 +33,10 @@
             "types": "./dist/objects.d.ts",
             "import": "./dist/objects.js"
         },
+        "./mixins": {
+            "types": "./dist/mixins.d.ts",
+            "import": "./dist/mixins.js"
+        },
         "./data": {
             "types": "./dist/data.d.ts",
             "import": "./dist/data.js"

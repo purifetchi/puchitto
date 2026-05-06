@@ -71,6 +71,55 @@ game.run({
 
 The game will then autoconnect to the server and fetch the currently present level to load into it.
 
+## Configuration
+
+This project utilizes ECMAScript Stage 3 decorators. Because modern environments are still rolling out native support, you must configure your build toolchain to target `es2022` (or newer) to process the syntax correctly. 
+
+### Astro
+Update your `astro.config.mjs` to pass the `es2022` target down to Vite and esbuild:
+```javascript
+// @ts-check
+import { defineConfig } from 'astro/config';
+
+export default defineConfig({
+  vite: {
+    esbuild: {
+      target: 'es2022'
+    },
+    build: {
+      target: 'es2022'
+    }
+  }
+});
+```
+
+### Vite
+If you are using standard Vite, configure the targets directly in your `vite.config.js` or `vite.config.ts`:
+```javascript
+import { defineConfig } from 'vite';
+
+export default defineConfig({
+  esbuild: {
+    target: 'es2022'
+  },
+  build: {
+    target: 'es2022'
+  }
+});
+```
+
+### TypeScript
+If you are relying on `tsc` for compilation or type-checking, update your `tsconfig.json`. You must set the target to `ES2022` (or newer) and ensure that legacy experimental decorators are disabled:
+```json
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "experimentalDecorators": false 
+  }
+}
+```
+> **Note:** `experimentalDecorators` defaults to `false` in modern TypeScript versions, but if it is enabled elsewhere in your config, it will override the modern Stage 3 standard and cause errors.
+
 ## Contributing
 
 If you'd really want to contribute to this project (thank you!) please adhere to the [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/) commit format as much as you can.

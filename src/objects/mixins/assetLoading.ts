@@ -22,6 +22,11 @@ export interface AssetLoading {
     loader?: LoadingManager;
 
     /**
+     * Value signifying whether this entity is loading its own assets.
+     */
+    isLoading: boolean;
+
+    /**
      * Signals the beginning of an asset load operation.
      * Increments the internal pending asset counter.
      */
@@ -80,6 +85,14 @@ export function AssetLoading<T extends GConstructor<GameObject>>(Base: T): T & G
          */
         get loader() {
             return this._loader
+        }
+
+        /**
+         * Value signifying whether this entity is loading its own assets.
+         * @returns Whether this entity is still loading its assets.
+         */
+        get isLoading() {
+            return this._pendingAssets > 0
         }
 
         /**

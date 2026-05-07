@@ -250,6 +250,11 @@ export class EntityFactory {
         const serializedProps = metadata?.serializedProps as SerializedMetadataProps | undefined
         if (serializedProps !== undefined) {
             for (const [propName, path] of Object.entries(serializedProps)) {
+                // Skip over uninit properties, let them default.
+                if (ent.data[path] === undefined) {
+                    continue
+                }
+
                 const key = propName as keyof T
                 obj[key] = ent.data[path]
             }

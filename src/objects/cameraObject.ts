@@ -8,19 +8,19 @@ export class CameraObject extends GameObject {
      * The width of the camera.
      */
     @Serialized("width")
-    accessor width!: number
+    accessor width: number = 1280
 
     /**
      * The height of the camera.
      */
     @Serialized("height")
-    accessor height!: number
+    accessor height: number = 720
 
     /**
      * The type of the camera.
      */
     @Serialized("type")
-    accessor type: "ortographic" | "perspective" | undefined
+    accessor type: "ortographic" | "perspective" | undefined = "perspective"
 
     /**
      * The near clipping plane.
@@ -56,13 +56,8 @@ export class CameraObject extends GameObject {
      */
     private _camera! : Camera
 
-    constructor(opts : GameObjectOptions) {
-        super(opts)
-    }
-
     onGameSet(): void {
         this._camera = this._makeCamera()
-        this._camera.lookAt(new Vector3(0, 0, 0))
 
         this.listener = new AudioListener()
         this._camera.attach(this.listener)

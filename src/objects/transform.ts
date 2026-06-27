@@ -81,4 +81,12 @@ export class Transform {
     setUniformScale(size: number) {
         this.scale.set(size, size, size)
     }
+
+    /**
+     * Makes this object look at another object.
+     * @param object The other object.
+     */
+    lookAt(object: GameObject) {
+        this._obj.threeObject.lookAt(object.transform.position)
+    }
 }

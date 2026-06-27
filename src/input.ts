@@ -26,6 +26,11 @@ export class Input {
     private _enabled : boolean = true
 
     /**
+     * Have the keys changed this frame?
+     */
+    private _keysChanged : boolean = false
+
+    /**
      * The array of active scancodes
      */
     private _scanCodeMap : Set<string> = new Set<string>()
@@ -146,6 +151,7 @@ export class Input {
             return
         }
 
+        this._keysChanged = true
         this._scanCodeMap.add(evt.code)
         evt.preventDefault()
     }
@@ -155,6 +161,7 @@ export class Input {
      * @param evt The keyboard event.
      */
     private _keyUp(evt : KeyboardEvent) : void {
+        this._keysChanged = true
         this._scanCodeMap.delete(evt.code)
 
         evt.preventDefault()
@@ -188,6 +195,7 @@ export class Input {
         this._delta.y = 0
         this._pressed.fill(0)
         this._movedMouse = false
+        this._keysChanged = false
     }
 
     /**
@@ -243,5 +251,12 @@ export class Input {
      */
     get hasMovedMouse() : boolean {
         return this._movedMouse
+    }
+
+    /**
+     * Returns whether the pressed keys have changed this frame.
+     */
+    get keysChanged() : boolean {
+        return this._keysChanged
     }
 }

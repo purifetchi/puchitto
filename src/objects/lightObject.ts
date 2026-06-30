@@ -11,19 +11,19 @@ export class LightObject extends GameObject {
      * The color of the light.
      */
     @Serialized("color")
-    accessor color!: number[]
+    accessor color: number[] = [1, 1, 1, 1]
 
     /**
      * The intensity of the light.
      */
     @Serialized("intensity")
-    accessor intensity!: number
+    accessor intensity: number = 1
 
     /**
      * The range of the light.
      */
     @Serialized("range")
-    accessor range!: number
+    accessor range: number = 100
 
     /**
      * The three.js light object.

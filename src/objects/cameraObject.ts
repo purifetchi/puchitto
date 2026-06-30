@@ -1,6 +1,5 @@
 import { AudioListener, Camera, OrthographicCamera, PerspectiveCamera, Vector3 } from "three";
 import { GameObject } from "./gameObject";
-import { GameObjectOptions } from "./gameObjectOptions";
 import { Serialized } from "../serialization";
 
 export class CameraObject extends GameObject {

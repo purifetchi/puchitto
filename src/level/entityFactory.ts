@@ -1,6 +1,7 @@
 import { Game } from "../game";
 import type { CreateEntityPacket } from "../networking/packets/internal/createEntityPacket";
 import { CameraObject } from "../objects";
+import { AmbientLightObject } from "../objects/ambientLightObject";
 import type { AnticsDefinition } from "../objects/anticsDefinition";
 import { AudioObject } from "../objects/audioObject";
 import { GameObject } from "../objects/gameObject";
@@ -77,6 +78,7 @@ export class EntityFactory {
         this.registerEntity<AudioObject>("audio", AudioObject)
         this.registerEntity<MarkerObject>("marker", MarkerObject)
         this.registerEntity<CameraObject>("camera", CameraObject)
+        this.registerEntity<AmbientLightObject>("light_ambient", AmbientLightObject)
     }
 
     /**

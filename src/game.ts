@@ -1,6 +1,5 @@
 import * as THREE from 'three';
 import * as events from "@mary/events";
-import { zeroTransform } from './level/transformData';
 import { InternalPacketTypes } from './networking/packets/internal/internalPacketTypes';
 import { readHelloPacket } from './networking/packets/internal/helloPacket';
 import { writeJoinPacket, type JoinPacket } from './networking/packets/internal/joinPacket';
@@ -18,11 +17,13 @@ import { DataManager } from './data/dataManager';
 import { NetworkManager, NetworkReader, NetworkWriter } from './networking';
 import { MiniAnticsEnvironment } from './scripting';
 import { GameLoader } from '.';
-import { CSS3DRenderer, EffectComposer, OutlinePass, OutputPass, RenderPass } from 'three/examples/jsm/Addons.js';
+import { CSS3DRenderer, EffectComposer, OutputPass, RenderPass } from 'three/examples/jsm/Addons.js';
 import { KeepAlivePacket } from './networking/packets/internal/keepAlivePacket';
 import { NetworkListener } from './networking/networkListener';
 import { GameSystem } from './systems/gameSystem';
 import { InteractableObjectSystem } from './systems/interactableObjectSystem';
+import { AudioListenerObject } from './objects/audioListenerObject';
+import { RealmInfoObject } from './objects/realmInfoObject';
 
 /**
  * The main class for the game.
@@ -119,6 +120,16 @@ export abstract class Game {
     private _objectIdMap: Map<number, GameObject> = new Map<number, GameObject>()
 
     /**
+     * The last internal id.
+     */
+    private _lastInternalId: number = 0
+
+    /**
+     * The audio listener.
+     */
+    private _listener?: AudioListenerObject
+
+    /**
      * An event stream for objects to subscribe to.
      */
     eventStream = new events.EventEmitter<{
@@ -177,23 +188,25 @@ export abstract class Game {
 
         this._objects = []
         this._objectIdMap.clear()
+        this._lastInternalId = 0
 
-        const res = this._getResolution()
         this._scene = new THREE.Scene()
-        this._camera = new CameraObject({
-            id: 0, // The level always begins with id=1, so the camera can be id=0.
-            transform: zeroTransform(),
-            tag: 'internal',
-            visible: true
-        })
+        this._camera = this.createDefaultCamera()
 
-        this._camera.width = res.x
-        this._camera.height = res.y
-        this.addObject(this._camera)
-
-        this.setMainCamera(this._camera)
+        // Create the main audio listener
+        this._listener = this._entityFactory.create("pch_audio_listener", this.getNextInternalId(), {})
+        if (this._listener !== undefined) {
+            this.addObject(this._listener)
+        }
 
         this.eventStream.emit('sceneCreated')
+    }
+
+    /**
+     * Gets the audio listener object.
+     */
+    get audioListener(): AudioListenerObject | undefined {
+        return this._listener
     }
 
     /**
@@ -202,12 +215,50 @@ export abstract class Game {
      */
     setMainCamera(camera: CameraObject) {
         this._camera = camera
+        this._listener?.parent(camera)
+
         if (this._composer !== undefined) {
             this._composer.reset()
             this._composer.dispose()
         }
 
         this._setupEffectPipeline()
+    }
+
+    /**
+     * Creates the default camera.
+     */
+    protected createDefaultCamera(): CameraObject {
+        const camera = this._entityFactory.create("camera", this.getNextInternalId(), {})! as CameraObject
+        this.addObject(camera)
+
+        const res = this._getResolution()
+        camera.resize(res.x, res.y)
+
+        return camera
+    }
+
+    /**
+     * Creates the default camera.
+     */
+    protected resolveMainCamera(): CameraObject {
+        // First, check if we have a realm_info entity.
+        const objects = this.getObjectsOfType("realm_info")
+        if (objects.length < 1) {
+            console.warn(`[Game::resolveMainCamera] No default camera found! Falling back to the default camera...`)
+            return this._camera
+        }
+
+        const realmInfo = objects[0] as RealmInfoObject
+
+        // Get the camera reference
+        const camera = this.getObjectById(realmInfo.defaultCamera)
+        if (camera === undefined || !(camera instanceof CameraObject)) {
+            console.warn(`[Game::resolveMainCamera] Entity ${realmInfo.defaultCamera} is not a camera!`)
+            return this._camera
+        }
+
+        return camera
     }
 
     /**
@@ -370,6 +421,19 @@ export abstract class Game {
     }
 
     /**
+     * Gets all the objects of a given type.
+     * @param type The type.
+     */
+    getObjectsOfType(type: string): GameObject[] {
+        const objs = this._objects.filter(o => {
+            const objectType = this._entityFactory.resolveType(o)
+            return objectType === type
+        })
+
+        return objs
+    }
+
+    /**
      * Removes an object from the scene.
      * @param object The object to remove.
      */
@@ -440,6 +504,14 @@ export abstract class Game {
     makeChildEnvironment() : MiniAnticsEnvironment {
         const newEnv = new MiniAnticsEnvironment(this._baseEnvironment)
         return newEnv
+    }
+
+    /**
+     * Gets the next internal entity ID.
+     * @returns The ID of the internal entity.
+     */
+    protected getNextInternalId(): number {
+        return --this._lastInternalId
     }
 
     /**
@@ -559,12 +631,7 @@ export abstract class Game {
      * Adds the default event stream listeners.
      */
     private _addDefaultEventStreamListeners() {
-        this.eventStream.on("loaded", () => {
-            this._networkManager.send<LoadStatePacket>({
-                type: InternalPacketTypes.LOAD_STATE_UPDATE,
-                state: LoadState.LOADED
-            }, writeLoadStatePacket)
-        })
+        this.eventStream.on("loaded", this._onRealmLoadedInternal.bind(this))
 
         this.registerCustomEventStreamHandlers()
     }
@@ -574,6 +641,21 @@ export abstract class Game {
      */
     protected registerCustomPacketHandlers() : void {
 
+    }
+
+    /**
+     * Called when the realm finished loading.
+     */
+    private _onRealmLoadedInternal(): void {
+        const newCamera = this.resolveMainCamera()
+        if (newCamera !== this._camera) {
+            this.setMainCamera(newCamera)
+        }
+
+        this._networkManager.send<LoadStatePacket>({
+            type: InternalPacketTypes.LOAD_STATE_UPDATE,
+            state: LoadState.LOADED
+        }, writeLoadStatePacket)
     }
 
     /**

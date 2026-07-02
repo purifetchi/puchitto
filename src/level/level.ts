@@ -6,6 +6,6 @@ import { LightData } from "./lightData";
  */
 export interface Level {
     version?: number,
-    ambient: LightData,
+    ambient?: LightData,
     ents: LevelEntityDefinition[]
 }

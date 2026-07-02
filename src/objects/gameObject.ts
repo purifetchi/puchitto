@@ -101,7 +101,7 @@ export class GameObject {
         this._visible = opts?.visible ?? true
         this._objectAntics = this._parseAntics(opts?.antics)
 
-        console.log(`[GameObject::constructor] Constructed object ${this.name} with id ${this.id} and authority ${this.hasAuthority}`)
+        console.log(`[GameObject::constructor] Constructed ${this.constructor.name} ${this.name} with id ${this.id} and authority ${this.hasAuthority}`)
     }
 
     /**

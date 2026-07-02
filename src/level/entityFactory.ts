@@ -3,12 +3,14 @@ import type { CreateEntityPacket } from "../networking/packets/internal/createEn
 import { CameraObject } from "../objects";
 import { AmbientLightObject } from "../objects/ambientLightObject";
 import type { AnticsDefinition } from "../objects/anticsDefinition";
+import { AudioListenerObject } from "../objects/audioListenerObject";
 import { AudioObject } from "../objects/audioObject";
 import { GameObject } from "../objects/gameObject";
 import { GameObjectOptions } from "../objects/gameObjectOptions";
 import { LightObject } from "../objects/lightObject";
 import { MarkerObject } from "../objects/markerObject";
 import { ModelObject } from "../objects/modelObject";
+import { RealmInfoObject } from "../objects/realmInfoObject";
 import { SerializedMetadataProps } from "../serialization";
 import { LevelEntityDefinition } from "./levelEntityDefinition";
 import { jsonTransformToRegularTransform, unityJsonTransformToRegularTransform, zeroTransform, type TransformData } from "./transformData";
@@ -79,6 +81,9 @@ export class EntityFactory {
         this.registerEntity<MarkerObject>("marker", MarkerObject)
         this.registerEntity<CameraObject>("camera", CameraObject)
         this.registerEntity<AmbientLightObject>("light_ambient", AmbientLightObject)
+
+        this.registerEntity<RealmInfoObject>("realm_info", RealmInfoObject)
+        this.registerEntity<AudioListenerObject>("pch_audio_listener", AudioListenerObject)
     }
 
     /**

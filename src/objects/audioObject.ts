@@ -1,6 +1,5 @@
 import { PositionalAudio, Audio, AudioLoader, LoadingManager } from "three";
 import { GameObject } from "./gameObject";
-import { GameObjectOptions } from "./gameObjectOptions";
 import { MiniAnticsEnvironment } from "../scripting";
 import { Serialized } from "../serialization";
 import { AssetLoading } from "./mixins/assetLoading";
@@ -62,9 +61,15 @@ export class AudioObject extends AssetLoading(GameObject) {
      * Called when we set the game.
      */
     onGameSet(): void {
+        const listener = this.game.audioListener?.listener
+        if (listener === undefined) {
+            console.warn(`[AudioObject::onGameSet] No audio listener!`)
+            return
+        }
+
         const audio = this.is3D
-            ? new PositionalAudio(this.game._camera.listener)
-            : new Audio(this.game._camera.listener)
+            ? new PositionalAudio(listener)
+            : new Audio(listener)
 
         this.beginAssetLoad()
 

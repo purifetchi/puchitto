@@ -19,7 +19,7 @@ export class CameraObject extends GameObject {
      * The type of the camera.
      */
     @Serialized("type")
-    accessor type: "ortographic" | "perspective" | undefined = "perspective"
+    accessor type: "orthographic" | "perspective" | undefined = "perspective"
 
     /**
      * The near clipping plane.
@@ -46,25 +46,21 @@ export class CameraObject extends GameObject {
     accessor zoom: number = 6
 
     /**
-     * The audio listener.
-     */
-    listener!: AudioListener
-
-    /**
      * The THREE camera.
      */
     private _camera! : Camera
 
     onGameSet(): void {
         this._camera = this._makeCamera()
-
-        this.listener = new AudioListener()
-        this._camera.attach(this.listener)
-
         this.attachThreeObject(this._camera)
     }
 
     onSerializedPropertyChanged(name: string): void {
+        if (name === "type") {
+            this._camera = this._makeCamera()
+            return
+        }
+
         if (this.camera instanceof PerspectiveCamera) {
             this.camera.fov = this.fov
             this.camera.near = this.near

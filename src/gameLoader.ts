@@ -48,7 +48,10 @@ export class GameLoader {
      * @param level The level.
      */
     private _loadLevel(level: Level) {
-        this._setAmbient(level.ambient)
+        // This changed in version 2, now we have a light_ambient entity.
+        if ((level.version ?? 1) < 2 && level.ambient !== undefined) {
+            this._setAmbient(level.ambient)
+        }
 
         this._totalEntities = level.ents.length
         this._awaitedEntities = this._totalEntities

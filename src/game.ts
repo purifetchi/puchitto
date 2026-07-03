@@ -250,15 +250,20 @@ export abstract class Game {
         }
 
         const realmInfo = objects[0] as RealmInfoObject
-
-        // Get the camera reference
-        const camera = this.getObjectById(realmInfo.defaultCamera)
-        if (camera === undefined || !(camera instanceof CameraObject)) {
-            console.warn(`[Game::resolveMainCamera] Entity ${realmInfo.defaultCamera} is not a camera!`)
-            return this._camera
+        if (realmInfo.defaultCamera !== undefined) {
+            const camera = this.getObjectById(realmInfo.defaultCamera)
+            if (camera instanceof CameraObject) {
+                return camera
+            }
         }
 
-        return camera
+        // Get the camera reference
+        console.warn(`[Game::resolveMainCamera] Failed to resolve camera with id ${realmInfo.defaultCamera}, defaulting to first found...`)
+
+        const potentialCameras = this.getObjectsOfType("camera")
+        const firstCamera = potentialCameras.find(v => !v.isLocalObject) as CameraObject
+
+        return firstCamera ?? this._camera
     }
 
     /**

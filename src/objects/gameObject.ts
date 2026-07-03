@@ -105,6 +105,13 @@ export class GameObject {
     }
 
     /**
+     * Returns whether this object is a local entity.
+     */
+    get isLocalObject(): boolean {
+        return this.id < 0
+    }
+
+    /**
      * Attaches a THREE.js object to this gameobject.
      * @param obj The THREE.js object to attach.
      */

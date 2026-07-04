@@ -106,6 +106,27 @@ export class Transform {
     }
 
     /**
+     * The forward vector.
+     */
+    get forward() {
+        return new Vector3(0, 0, 1).applyQuaternion(this.rotation)
+    }
+
+    /**
+     * The forward vector.
+     */
+    get up() {
+        return new Vector3(0, 1, 0).applyQuaternion(this.rotation)
+    }
+
+    /**
+     * The forward vector.
+     */
+    get right() {
+        return new Vector3(1, 0, 0).applyQuaternion(this.rotation)
+    }
+
+    /**
      * Sets a uniform scale.
      * @param size The size of the scale.
      */

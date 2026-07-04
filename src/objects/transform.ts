@@ -1,5 +1,6 @@
 import { Euler, Quaternion, Vector3 } from "three";
 import { GameObject } from "./gameObject";
+import { MathUtils } from "three/src/math/MathUtils.js";
 
 /**
  * Contains the transform information for an object.
@@ -58,6 +59,36 @@ export class Transform {
      */
     set euler(euler: Euler) {
         this._obj.threeObject.rotation.copy(euler)
+    }
+
+    /**
+     * Gets the euler angles of this object, in degrees.
+     */
+    get eulerDeg() {
+        return new Euler(
+            this._obj.threeObject.rotation.x * MathUtils.RAD2DEG,
+            this._obj.threeObject.rotation.y * MathUtils.RAD2DEG,
+            this._obj.threeObject.rotation.z * MathUtils.RAD2DEG
+        )
+    }
+
+    /**
+     * Sets the euler angles of this object.
+     */
+    set eulerDeg(euler: Euler) {
+        this.setRotationFromDegrees(euler.x, euler.y, euler.z)
+    }
+
+    /**
+     * Sets the rotation from degree-based components
+     * @param x The x rotation component.
+     * @param y The y rotation component.
+     * @param z The z rotation component.
+     */
+    setRotationFromDegrees(x: number, y: number, z: number): void {
+        this._obj.threeObject.rotation.x = x * MathUtils.DEG2RAD
+        this._obj.threeObject.rotation.y = y * MathUtils.DEG2RAD
+        this._obj.threeObject.rotation.z = z * MathUtils.DEG2RAD
     }
 
     /**

@@ -57,7 +57,9 @@ export class CameraObject extends GameObject {
 
     onSerializedPropertyChanged(name: string): void {
         if (name === "type") {
+            this._camera.remove()
             this._camera = this._makeCamera()
+            this.attachThreeObject(this._camera)
             return
         }
 

@@ -1,6 +1,6 @@
 import { Game } from "../game";
 import type { CreateEntityPacket } from "../networking/packets/internal/createEntityPacket";
-import { CameraObject } from "../objects";
+import { BackgroundEnvironmentObject, CameraObject } from "../objects";
 import { AmbientLightObject } from "../objects/ambientLightObject";
 import type { AnticsDefinition } from "../objects/anticsDefinition";
 import { AudioListenerObject } from "../objects/audioListenerObject";
@@ -83,6 +83,9 @@ export class EntityFactory {
         this.registerEntity<AmbientLightObject>("light_ambient", AmbientLightObject)
 
         this.registerEntity<RealmInfoObject>("realm_info", RealmInfoObject)
+        this.registerEntity<BackgroundEnvironmentObject>("env_background", BackgroundEnvironmentObject)
+
+        // pch_ prefixed entities are engine-internal and only ever instantiated by Puchitto.
         this.registerEntity<AudioListenerObject>("pch_audio_listener", AudioListenerObject)
     }
 

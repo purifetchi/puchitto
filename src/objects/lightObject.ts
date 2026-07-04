@@ -45,7 +45,7 @@ export class LightObject extends GameObject {
      */
     onSerializedPropertyChanged(): void {
         this._light.color = new Color(this.color[0], this.color[1], this.color[2])
-        this._light.intensity = this.intensity * 50
+        this._light.intensity = this.intensity
         this._light.distance = this.range
     }
 }

@@ -217,6 +217,10 @@ export abstract class Game {
         this._camera = camera
         this._listener?.parent(camera)
 
+        // Resize the camera to fit the viewport.
+        const res = this._getResolution()
+        camera.resize(res.x, res.y)
+
         if (this._composer !== undefined) {
             this._composer.reset()
             this._composer.dispose()

@@ -1,4 +1,4 @@
-import { AudioListener, Camera, OrthographicCamera, PerspectiveCamera, Vector3 } from "three";
+import { Camera, OrthographicCamera, PerspectiveCamera, Vector3 } from "three";
 import { GameObject } from "./gameObject";
 import { Serialized } from "../serialization";
 
@@ -57,7 +57,7 @@ export class CameraObject extends GameObject {
 
     onSerializedPropertyChanged(name: string): void {
         if (name === "type") {
-            this._camera.remove()
+            this._camera?.remove()
             this._camera = this._makeCamera()
             this.attachThreeObject(this._camera)
             return
@@ -106,13 +106,19 @@ export class CameraObject extends GameObject {
     private _makeCamera(): Camera {
         const aspect = this.width / this.height
 
-        if (this.type === "perspective")
-        {
-            return new PerspectiveCamera(this.fov, aspect, this.near, this.far)
+        let cam: Camera
+        if (this.type === "perspective") {
+            cam = new PerspectiveCamera(this.fov, aspect, this.near, this.far)
+        } else {
+            cam = new OrthographicCamera(
+                -this.zoom * aspect, this.zoom * aspect, this.zoom, -this.zoom, this.near, this.far
+            )
         }
 
-        return new OrthographicCamera(
-            -this.zoom * aspect, this.zoom * aspect, this.zoom, -this.zoom, this.near, this.far
-        )
+        // NOTE: Because for some reason the camera entity looks in the opposite direction
+        //       of the forward vector, we need to adjust it.
+        cam.lookAt(new Vector3(0, 0, 1))
+
+        return cam
     }
 }

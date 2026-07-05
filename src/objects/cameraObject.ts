@@ -67,6 +67,9 @@ export class CameraObject extends GameObject {
             this.camera.fov = this.fov
             this.camera.near = this.near
             this.camera.far = this.far
+        } else if (this.camera instanceof OrthographicCamera) {
+            this.camera.near = this.near
+            this.camera.far = this.far
         }
     }
 

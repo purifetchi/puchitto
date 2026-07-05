@@ -58,16 +58,22 @@ export class BackgroundEnvironmentObject extends AssetLoading(GameObject) {
      * Called when any of the serialized properties change.
      */
     onSerializedPropertyChanged(path: string): void {
-        if (!this.isLoading) {
+        if (this.game !== undefined) {
             this._loadBackground()
         }
+    }
+
+    /**
+     * Called when we set the game.
+     */
+    onGameSet(): void {
+        this._loadBackground()
     }
 
     /**
      * Loads the background.
      */
     private _loadBackground(): void {
-        console.log('loadBackground')
         switch (this.type) {
             case 'cubeSkybox':
                 this._buildSkybox().then(asset => {

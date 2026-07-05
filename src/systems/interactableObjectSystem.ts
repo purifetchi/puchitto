@@ -70,7 +70,7 @@ export class InteractableObjectSystem implements GameSystem {
         let gameObject
         for (const obj of this._game.raycast()) {
             let actualObj = obj.object
-            if (actualObj.type == "Mesh" && actualObj.parent !== null) {
+            while (actualObj !== undefined && actualObj.userData['id'] === undefined && actualObj.parent !== null) {
                 actualObj = actualObj.parent
             }
 

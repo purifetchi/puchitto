@@ -59,7 +59,7 @@ export class GameLoader {
         for (const ent of level.ents) {
             const createdEntity = this._game._entityFactory.createFromLevelDefinition(ent, level.version ?? 1)
             if (createdEntity !== undefined) {
-                if ('IS_ASSET_LOADING' in createdEntity) {
+                if ('IS_ASSET_LOADING' in createdEntity && 'isLoading' in createdEntity && createdEntity.isLoading === true) {
                     const unlink = createdEntity.eventStream.on('loadedAssets', () => {
                         this._tickOneLoadedEntity()
                         unlink()

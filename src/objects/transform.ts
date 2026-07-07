@@ -141,4 +141,14 @@ export class Transform {
     lookAt(object: GameObject) {
         this._obj.threeObject.lookAt(object.transform.position)
     }
+
+    /**
+     * Copies a transform from another object.
+     * @param object The other object.
+     */
+    copy(object: GameObject) {
+        this.position.copy(object.transform.position)
+        this.rotation.copy(object.transform.rotation)
+        this.scale.copy(object.transform.scale)
+    }
 }

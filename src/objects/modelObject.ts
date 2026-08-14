@@ -12,10 +12,10 @@ export class ModelObject extends AssetLoading(GameObject) {
     accessor path!: string
 
     @Serialized("transparent")
-    accessor transparent!: boolean
+    accessor transparent: boolean = false
 
     @Serialized("clamp")
-    accessor clamp!: boolean
+    accessor clamp: boolean = false
 
     private _materials: Record<string, Material> = {}
 

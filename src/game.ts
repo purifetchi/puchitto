@@ -153,6 +153,13 @@ export abstract class Game {
     }
 
     /**
+     * Returns the parent element for the game.
+     */
+    get parentElement() : HTMLElement {
+        return this._parentElement
+    }
+
+    /**
      * Runs the game.
      * @param opts The options.
      */

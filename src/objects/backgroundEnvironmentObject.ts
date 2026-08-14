@@ -50,6 +50,12 @@ export class BackgroundEnvironmentObject extends AssetLoading(GameObject) {
     accessor skyboxNegZ: string | undefined = undefined
 
     /**
+     * The CSS code.
+     */
+    @Serialized("css")
+    accessor css : string | undefined = undefined
+
+    /**
      * The skybox texture.
      */
     private _skybox?: CubeTexture = undefined
@@ -74,6 +80,7 @@ export class BackgroundEnvironmentObject extends AssetLoading(GameObject) {
      * Loads the background.
      */
     private _loadBackground(): void {
+        this.game.parentElement.style.background = ''
         switch (this.type) {
             case 'cubeSkybox':
                 this._buildSkybox().then(asset => {
@@ -90,11 +97,42 @@ export class BackgroundEnvironmentObject extends AssetLoading(GameObject) {
                 })
                 break
 
+            case 'css':
+                this.beginAssetLoad()
+                this._buildCssBackground()
+                this.finishAssetLoad()
+                break
+
             default:
                 console.warn(`[BackgroundEnvironmentObject:_loadBackground] Background type ${this.type} is not supported yet.`)
                 break
 
         }
+    }
+
+    /**
+     * Builds the CSS background.
+     */
+    private _buildCssBackground(): void {
+        let css = this.css ?? ""
+        const assetRegex = /asset:\/\/[^'"\s\)]+/g
+
+        // Try to match the asset references from within the CSS.
+        const matches = [...css.matchAll(assetRegex)]
+        console.log(matches)
+        if (matches.length > 0) {
+            for (const match of matches) {
+                let url = decodeURIComponent(match[0])
+                url = url.replace('asset://', '')
+
+                const newUrl = this.loader?.resolveURL(url)
+                if (newUrl !== undefined) {
+                    css = css.replace(match[0], newUrl)
+                }
+            }
+        }
+
+        this.game.parentElement.style.background = css
     }
 
     /**

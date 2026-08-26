@@ -130,6 +130,16 @@ export abstract class Game {
     private _listener?: AudioListenerObject
 
     /**
+     * The default realm location as told by the server's hello packet.
+     */
+    private _defaultRealmLocation? : string
+
+    /**
+     * Whether we have already joined a realm.
+     */
+    private _hasJoined : boolean = false
+
+    /**
      * An event stream for objects to subscribe to.
      */
     eventStream = new events.EventEmitter<{
@@ -609,6 +619,9 @@ export abstract class Game {
      */
     private _registerNetworkSpecificMiniAnticsActions(environment : MiniAnticsEnvironment) {
         environment.set("is-server", false)
+        environment.set("join", (realm: string) => {
+            this.joinRealm(realm)
+        })
 
         environment.set("net-write-i32", (value: number, nw: NetworkWriter) => {
             nw.writeInt32(value)
@@ -675,21 +688,42 @@ export abstract class Game {
     }
 
     /**
+     * Sends a join packet to the server. If no link is given, the server's
+     * default realm is used when joining for the first time.
+     * @param link The realm link to join.
+     */
+    joinRealm(link?: string) : void {
+        const target = link ?? (this._hasJoined ? undefined : this._defaultRealmLocation)
+        if (target === undefined) {
+            throw new Error("[Game::joinRealm] No realm link was specified and we have no default realm to fall back to!")
+        }
+
+        this._hasJoined = true
+
+        this._networkManager.send<JoinPacket>({
+            type: InternalPacketTypes.JOIN,
+            link: target
+        }, writeJoinPacket)
+    }
+
+    /**
      * Adds the default packet handlers.
      */
     private _addDefaultPacketHandlers() {
         this._networkManager.addPacketHandler(InternalPacketTypes.HELLO, async (nr, game) => {
             const helloPacket = readHelloPacket(nr)
             console.log(`[Network::hello] Connected to ${helloPacket.branding} running ${helloPacket.gameRules}`)
+            this._defaultRealmLocation = helloPacket.defaultRealmLocation
 
             this.eventStream.emit("connected")
 
-            this._networkManager.send<JoinPacket>({
-                type: InternalPacketTypes.JOIN
-            }, writeJoinPacket)
+            this.joinRealm(helloPacket.defaultRealmLocation)
         })
 
         this._networkManager.addPacketHandler(InternalPacketTypes.LOAD, async (nr, game) => {
+            // Emit the initial loading event, to signify that we are, in fact, loading.
+            this.eventStream.emit("loading", 0)
+
             const loadPacket = readLoadPacket(nr)
             console.log(`[Network::load] Server told us to load ${loadPacket.levelName}`)
 
@@ -698,6 +732,7 @@ export abstract class Game {
                 state: LoadState.STARTED
             }, writeLoadStatePacket)
 
+            this.createScene()
             await this._dataManager.loadPackage(loadPacket.levelName)
 
             const gameLoader = new GameLoader(game)

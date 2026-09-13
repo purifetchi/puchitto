@@ -18,25 +18,25 @@ export class AudioObject extends AssetLoading(GameObject) {
      * Is the audio 3D?
      */
     @Serialized("is3D")
-    accessor is3D!: boolean
+    accessor is3D: boolean = true
 
     /**
      * Should the audio autoplay?
      */
     @Serialized("autoplay")
-    accessor autoplay!: boolean
+    accessor autoplay: boolean = false
 
     /**
      * Is the audio looping?
      */
     @Serialized("looping")
-    accessor looping!: boolean
+    accessor looping: boolean = false
 
     /**
      * The volume of the audio?
      */
     @Serialized("volume")
-    accessor volume!: number
+    accessor volume: number = 1
 
     /**
      * The audio.
@@ -88,5 +88,11 @@ export class AudioObject extends AssetLoading(GameObject) {
         })
 
         this._audio = audio
+    }
+
+    destroy(): void {
+        if (this.autoplay) {
+            this._audio?.stop()
+        }
     }
 }

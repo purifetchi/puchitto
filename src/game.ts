@@ -146,6 +146,11 @@ export abstract class Game {
     private _hasJoined : boolean = false
 
     /**
+     * The current realm's url.
+     */
+    private _realmUrl?: string
+
+    /**
      * An event stream for objects to subscribe to.
      */
     eventStream = new events.EventEmitter<{
@@ -188,14 +193,16 @@ export abstract class Game {
 
         this._parentElement = element
 
+        this._setupNetwork(server, listenerFactory)
         this._setupThree()
-        this._startNetwork(server, listenerFactory)
         this._baseEnvironment = this._makeBaseEnvironment()
 
         this._renderer.domElement.style.position = "absolute"
         this._css3D.domElement.style.position = "absolute"
         element.appendChild(this._css3D.domElement)
         element.appendChild(this._renderer.domElement)
+
+        this.connect()
     }
 
     /**
@@ -232,6 +239,13 @@ export abstract class Game {
      */
     get audioListener(): AudioListenerObject | undefined {
         return this._listener
+    }
+
+    /**
+     * The URL of the current realm.
+     */
+    get realmUrl(): string | undefined {
+        return this._realmUrl
     }
 
     /**
@@ -393,7 +407,7 @@ export abstract class Game {
     /**
      * Starts the network stack.
      */
-    _startNetwork(
+    private _setupNetwork(
         url: string,
         listenerFactory?: (url: string) => NetworkListener
     ) : void {
@@ -404,7 +418,6 @@ export abstract class Game {
         })
 
         this._addDefaultPacketHandlers()
-        this.connect()
     }
 
     /**
@@ -716,6 +729,7 @@ export abstract class Game {
         }
 
         this._hasJoined = true
+        this._realmUrl = target
 
         this._networkManager.send<JoinPacket>({
             type: InternalPacketTypes.JOIN,

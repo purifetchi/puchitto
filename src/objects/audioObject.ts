@@ -71,16 +71,12 @@ export class AudioObject extends AssetLoading(GameObject) {
             ? new PositionalAudio(listener)
             : new Audio(listener)
 
-        this.beginAssetLoad()
-
-        const loader = new AudioLoader(this.loader)
-        loader.load(this.path, (data) => {
+        this.loadAssetSync<AudioBuffer>(this.path, data => {
             audio.setBuffer(data)
             audio.setVolume(this.volume)
             audio.setLoop(this.looping)
 
             this.attachThreeObject(audio)
-            this.finishAssetLoad()
 
             if (this.autoplay) {
                 audio.play()

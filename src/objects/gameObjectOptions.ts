@@ -1,6 +1,7 @@
 import type { LoadingManager } from "three";
 import { type TransformData } from "../level/transformData";
 import type { AnticsDefinition } from "./anticsDefinition";
+import { AssetManager } from "../data/assetManager";
 
 export interface GameObjectOptions {
     id : number,
@@ -10,5 +11,6 @@ export interface GameObjectOptions {
     loader? : LoadingManager | undefined,
     antics? : AnticsDefinition[] | undefined,
     transform: TransformData,
-    visible: boolean
+    visible: boolean,
+    assetManager: AssetManager
 }

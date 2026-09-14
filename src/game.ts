@@ -24,6 +24,7 @@ import { GameSystem } from './systems/gameSystem';
 import { InteractableObjectSystem } from './systems/interactableObjectSystem';
 import { AudioListenerObject } from './objects/audioListenerObject';
 import { RealmInfoObject } from './objects/realmInfoObject';
+import { AssetManager } from './data/assetManager';
 
 /**
  * The main class for the game.
@@ -53,6 +54,11 @@ export abstract class Game {
      * The data manager.
      */
     _dataManager! : DataManager
+
+    /**
+     * The caching asset manager.
+     */
+    _assetManager! : AssetManager
 
     /**
      * The WebSocket listener.
@@ -203,6 +209,8 @@ export abstract class Game {
             }
         }
 
+        this._assetManager.clear()
+
         this._objects = []
         this._objectIdMap.clear()
         this._lastInternalId = 0
@@ -305,6 +313,7 @@ export abstract class Game {
         this._input = new Input(this._renderer.domElement)
         this._raycaster = new THREE.Raycaster()
         this._dataManager = new DataManager()
+        this._assetManager = new AssetManager(this._dataManager.loader)
         this._entityFactory = new EntityFactory(this)
         this.registerCustomEntities(this._entityFactory)
 
@@ -314,6 +323,7 @@ export abstract class Game {
         })
         this._resizeObserver.observe(this._parentElement)
 
+        this.registerCustomAssetTypes(this._assetManager)
         this.registerCustomGameSystems()
         this.createScene()
     }
@@ -354,6 +364,13 @@ export abstract class Game {
      */
     protected registerCustomGameSystems() {
         this.addGameSystem(new InteractableObjectSystem())
+    }
+
+    /**
+     * Registers custom asset types.
+     */
+    protected registerCustomAssetTypes(manager: AssetManager) {
+
     }
 
     /**

@@ -1,5 +1,6 @@
 import { LoadingManager } from "three";
 import { GameObject } from "../gameObject";
+import { AssetManager } from "../../data/assetManager";
 
 /**
  * A generic constructor type that accepts any arguments and returns an instance of T.
@@ -22,6 +23,11 @@ export interface AssetLoading {
     loader?: LoadingManager;
 
     /**
+     * The asset manager.
+     */
+    assetManager: AssetManager
+
+    /**
      * Value signifying whether this entity is loading its own assets.
      */
     isLoading: boolean;
@@ -31,6 +37,20 @@ export interface AssetLoading {
      * Increments the internal pending asset counter.
      */
     beginAssetLoad(): void;
+
+    /**
+     * Asynchronously loads an asset, also marking it in the pending loads counter.
+     * @param path The path to the asset.
+     * @returns The promise of the asset.
+     */
+    loadAsset<T>(path: string): Promise<T>;
+
+    /**
+     * Synchronously loads an asset, also marking it in the pending loads counter.
+     * @param path The path to the asset.
+     * @param callback the callback
+     */
+    loadAssetSync<T>(path: string, callback: (asset: T) => void): void;
 
     /**
      * Signals the completion of an asset load operation.
@@ -62,6 +82,11 @@ export function AssetLoading<T extends GConstructor<GameObject>>(Base: T): T & G
         private _loader?: LoadingManager
 
         /**
+         * The asset manager.
+         */
+        private _assetManager: AssetManager
+
+        /**
          * Counter for pending asset load operations.
          * */
         private _pendingAssets: number = 0
@@ -77,6 +102,8 @@ export function AssetLoading<T extends GConstructor<GameObject>>(Base: T): T & G
             if (opts?.loader) {
                 this._loader = opts.loader
             }
+
+            this._assetManager = opts.assetManager
         }
 
         /**
@@ -85,6 +112,14 @@ export function AssetLoading<T extends GConstructor<GameObject>>(Base: T): T & G
          */
         get loader() {
             return this._loader
+        }
+
+        /**
+         * Gets the asset manager for this realm.
+         * @returns The asset manager.
+         */
+        get assetManager() {
+            return this._assetManager
         }
 
         /**
@@ -101,6 +136,44 @@ export function AssetLoading<T extends GConstructor<GameObject>>(Base: T): T & G
          */
         beginAssetLoad() {
             this._pendingAssets++
+        }
+
+        /**
+         * Asynchronously loads an asset, also marking it in the pending loads counter.
+         * @param path The path to the asset.
+         * @returns The promise of the asset.
+         */
+        async loadAsset<T>(path: string): Promise<T> {
+            this.beginAssetLoad()
+
+            try {
+                return await this.assetManager.load<T>(path)
+            } catch (c) {
+                console.error(`[AssetLoading::loadAsset] Failed to load asset [${path}].`)
+                throw c
+            } finally {
+                this.finishAssetLoad()
+            }
+        }
+
+        /**
+         * Synchronously loads an asset, also marking it in the pending loads counter.
+         * @param path The path to the asset.
+         * @param callback the callback
+         */
+        loadAssetSync<T>(path: string, callback: (asset: T) => void) {
+            this.beginAssetLoad()
+
+            try {
+                this.assetManager.load<T>(path).then(a => {
+                    callback(a)
+                    this.finishAssetLoad()
+                })
+            } catch (c) {
+                console.error(`[AssetLoading::loadAsset] Failed to load asset [${path}].`)
+                this.finishAssetLoad()
+                throw c
+            }
         }
 
         /**

@@ -1,5 +1,4 @@
-import { FBXLoader, MTLLoader, OBJLoader } from "three/examples/jsm/Addons.js";
-import { ClampToEdgeWrapping, Group, LoadingManager, Material, Mesh, MeshToonMaterial, Object3DEventMap } from "three";
+import { ClampToEdgeWrapping, Group, Material, Mesh, MeshToonMaterial, Object3DEventMap } from "three";
 import { GameObject } from "./gameObject";
 import { Serialized } from "../serialization";
 import { AssetLoading } from "./mixins/assetLoading";
@@ -32,61 +31,8 @@ export class ModelObject extends AssetLoading(GameObject) {
      */
     onSerializedPropertyChanged(name: string): void {
         if (name === "path" && this.path !== undefined) {
-            this._load(this.path, this.loader)
+            this.loadAssetSync<Group>(this.path, group => this._setupModel(group))
         }
-    }
-
-    /**
-     * Loads a model based on its file extension.
-     * @param path The path to the model.
-     * @param loader The asset loader.
-     */
-    private _load(path: string, loader: LoadingManager | undefined) {
-        const split = path.split('.')
-        const extension = split[split.length - 1].trim()
-
-        switch (extension) {
-            case "obj":
-                this._loadObj(path, loader)
-                break
-
-            case "fbx":
-                this._loadFbx(path, loader)
-                break
-
-            default:
-                throw new Error(`[ModelObject::_load] Failed to load the model. Unknown format: ${extension}`)
-        }
-    }
-
-    /**
-     * Loads an OBJ format model.
-     * @param path The path to the file.
-     * @param loader The asset loader.
-     */
-    private _loadObj(path: string, loader: LoadingManager | undefined) {
-        this.beginAssetLoad()
-
-        const objLoader = new OBJLoader(loader)
-        const mtlLoader = new MTLLoader(loader)
-
-        mtlLoader.load(path.replace(".obj", ".mtl"), data => {
-            objLoader.setMaterials(data)
-
-            objLoader.load(path, data => this._setupModel(data))
-        })
-    }
-
-    /**
-     * Loads an FBX format model.
-     * @param path The path to the file.
-     * @param loader The asset loader.
-     */
-    private _loadFbx(path: string, loader: LoadingManager | undefined) {
-        this.beginAssetLoad()
-
-        const fbxLoader = new FBXLoader(loader)
-        fbxLoader.load(path, data => this._setupModel(data))
     }
 
     /**
@@ -137,7 +83,5 @@ export class ModelObject extends AssetLoading(GameObject) {
 
         this.clearAttachments()
         this.attachThreeObject(data)
-
-        this.finishAssetLoad()
     }
 }

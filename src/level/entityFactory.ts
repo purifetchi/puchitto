@@ -228,7 +228,8 @@ export class EntityFactory {
             loader: this._game._dataManager.loader,
             transform: ent.transform,
             visible: ent.visible,
-            hasAuthority: ent.hasAuthority
+            hasAuthority: ent.hasAuthority,
+            assetManager: this._game._assetManager
         }, type, ent.data)
 
         this._game.addObject(obj)
@@ -253,7 +254,8 @@ export class EntityFactory {
             loader: this._game._dataManager.loader,
             transform: ent.transform,
             visible: ent.visible,
-            hasAuthority: ent.hasAuthority
+            hasAuthority: ent.hasAuthority,
+            assetManager: this._game._assetManager
         })
 
         const metadata = obj.constructor[Symbol.metadata]

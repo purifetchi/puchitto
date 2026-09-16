@@ -86,6 +86,13 @@ export class AudioObject extends AssetLoading(GameObject) {
         this._audio = audio
     }
 
+    /**
+     * Plays the audio effect.
+     */
+    play(): void {
+        this._audio?.play()
+    }
+
     destroy(): void {
         if (this.autoplay) {
             this._audio?.stop()

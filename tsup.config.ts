@@ -4,6 +4,7 @@ export default defineConfig({
     entry: {
         index: 'src/index.ts',
         networking: 'src/networking/index.ts',
+        logging: 'src/logging/index.ts',
         scripting: 'src/scripting/index.ts',
         components: 'src/components/index.ts',
         tweening: 'src/tweening/index.ts',

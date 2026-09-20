@@ -1,3 +1,4 @@
+import { Logger } from "./logging"
 import * as THREE from 'three';
 import * as events from "@mary/events";
 import { InternalPacketTypes } from './networking/packets/internal/internalPacketTypes';
@@ -30,6 +31,12 @@ import { AssetManager } from './data/assetManager';
  * The main class for the game.
  */
 export abstract class Game {
+    /** The logger for this game. */
+    public readonly logger = new Logger('Game', this.constructor.name)
+
+    private readonly _networkLogger = new Logger('Network', 'PacketHandlers')
+    private readonly _scriptLogger = new Logger('MiniAntics', 'Game')
+
     /**
      * This game's scene.
      */
@@ -288,7 +295,7 @@ export abstract class Game {
         // First, check if we have a realm_info entity.
         const objects = this.getObjectsOfType("realm_info")
         if (objects.length < 1) {
-            console.warn(`[Game::resolveMainCamera] No default camera found! Falling back to the default camera...`)
+            this.logger.warn(`No default camera found! Falling back to the default camera...`)
             return this._camera
         }
 
@@ -301,7 +308,7 @@ export abstract class Game {
         }
 
         // Get the camera reference
-        console.warn(`[Game::resolveMainCamera] Failed to resolve camera with id ${realmInfo.defaultCamera}, defaulting to first found...`)
+        this.logger.warn(`Failed to resolve camera with id ${realmInfo.defaultCamera}, defaulting to first found...`)
 
         const potentialCameras = this.getObjectsOfType("camera")
         const firstCamera = potentialCameras.find(v => !v.isLocalObject) as CameraObject
@@ -620,7 +627,7 @@ export abstract class Game {
         environment.set("null?", (a: any) => a === undefined || a === null)
         environment.set("equal?", (a: any, b: any) => a == b)
         environment.set("different?", (a: any, b: any) => a !== b)
-        environment.set("print", (a: string) => console.log(`[MiniAntics] ${a}`))
+        environment.set("print", (a: string) => this._scriptLogger.log(`${a}`))
 
         environment.set("get-obj-by-name", (name: string) => this.getObjectByName(name))
         environment.set("get-obj-by-id", (id: number) => this.getObjectById(id))
@@ -743,7 +750,7 @@ export abstract class Game {
     private _addDefaultPacketHandlers() {
         this._networkManager.addPacketHandler(InternalPacketTypes.HELLO, async (nr, game) => {
             const helloPacket = readHelloPacket(nr)
-            console.log(`[Network::hello] Connected to ${helloPacket.branding} running ${helloPacket.gameRules}`)
+            this._networkLogger.log(`Connected to ${helloPacket.branding} running ${helloPacket.gameRules}`)
             this._defaultRealmLocation = helloPacket.defaultRealmLocation
 
             this.eventStream.emit("connected")
@@ -756,7 +763,7 @@ export abstract class Game {
             this.eventStream.emit("loading", 0)
 
             const loadPacket = readLoadPacket(nr)
-            console.log(`[Network::load] Server told us to load ${loadPacket.levelName}`)
+            this._networkLogger.log(`Server told us to load ${loadPacket.levelName}`)
 
             this._networkManager.send<LoadStatePacket>({
                 type: InternalPacketTypes.LOAD_STATE_UPDATE,
@@ -779,7 +786,7 @@ export abstract class Game {
             const packet = readRemoveEntityPacket(nr)
             const object = this.getObjectById(packet.id)
             if (object === undefined) {
-                console.error(`[Network::removeEntity] Got told to remove non-existant entity ${packet.id}`)
+                this._networkLogger.error(`Got told to remove non-existant entity ${packet.id}`)
                 return
             }
 
@@ -792,7 +799,7 @@ export abstract class Game {
             const object = game.getObjectById(id)
 
             if (object === undefined) {
-                console.error(`[Network::miniAnticsRpc] We were told to run RPC ${rpcName} for object ${id} that doesn't exist.`)
+                this._networkLogger.error(`We were told to run RPC ${rpcName} for object ${id} that doesn't exist.`)
                 return
             }
 

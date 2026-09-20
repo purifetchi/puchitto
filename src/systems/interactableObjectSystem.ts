@@ -61,7 +61,7 @@ export class InteractableObjectSystem implements GameSystem {
                 try {
                     gameObject?.runAntics("click")
                 } catch (e) {
-                    console.error(e, "Caught error while running antics script on click!")
+                    gameObject?.logger.error(e, "Caught error while running antics script on click!")
                 }
             }
             return
@@ -96,7 +96,7 @@ export class InteractableObjectSystem implements GameSystem {
                 try {
                     gameObject?.runAntics("click")
                 } catch (e) {
-                    console.error(e, "Caught error while running antics script on click!")
+                    gameObject?.logger.error(e, "Caught error while running antics script on click!")
                 }
             }
         } else {

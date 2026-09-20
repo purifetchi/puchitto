@@ -1,3 +1,4 @@
+import { Logger } from "../logging"
 import { LoadingManager } from "three"
 import { AlfPackage } from "./alf/alfPackage"
 import { DataProvider } from "./dataProvider"
@@ -7,6 +8,8 @@ import { AlfProvider } from "./providers/alfProvider"
  * The manager for currently loaded data.
  */
 export class DataManager {
+    private readonly _logger = new Logger('Data', 'DataManager')
+
     /**
      * The loading manager exposed by this data manager.
      */
@@ -43,7 +46,7 @@ export class DataManager {
         //       Should packages have some sort of tag, so for example we only dispose scene ones?
         this._disposeProviders()
 
-        console.log(`[DataManager::loadPackage] Loading ${path}...`)
+        this._logger.log(`Loading ${path}...`)
 
         const alfPackage = await AlfPackage.fetch(path)
         this.addProvider(new AlfProvider(alfPackage))

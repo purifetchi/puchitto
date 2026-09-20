@@ -149,7 +149,7 @@ export function AssetLoading<T extends GConstructor<GameObject>>(Base: T): T & G
             try {
                 return await this.assetManager.load<T>(path)
             } catch (c) {
-                console.error(`[AssetLoading::loadAsset] Failed to load asset [${path}].`)
+                this.logger.error(c, `Failed to load asset [${path}].`)
                 throw c
             } finally {
                 this.finishAssetLoad()
@@ -170,7 +170,7 @@ export function AssetLoading<T extends GConstructor<GameObject>>(Base: T): T & G
                     this.finishAssetLoad()
                 })
             } catch (c) {
-                console.error(`[AssetLoading::loadAsset] Failed to load asset [${path}].`)
+                this.logger.error(c, `Failed to load asset [${path}].`)
                 this.finishAssetLoad()
                 throw c
             }

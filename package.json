@@ -9,6 +9,10 @@
             "types": "./dist/index.d.ts",
             "import": "./dist/index.js"
         },
+        "./logging": {
+            "types": "./dist/logging.d.ts",
+            "import": "./dist/logging.js"
+        },
         "./networking": {
             "types": "./dist/networking.d.ts",
             "import": "./dist/networking.js"

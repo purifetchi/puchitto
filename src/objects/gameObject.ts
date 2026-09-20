@@ -1,3 +1,4 @@
+import { Logger } from "../logging"
 import { Group, type Object3D } from "three"
 import { EventEmitter } from "@mary/events"
 import type { AnticsDefinition, AnticsOn } from "./anticsDefinition"
@@ -13,6 +14,11 @@ import { Transform } from "./transform"
  * The base game object.
  */
 export class GameObject {
+    /**
+     * The logger for this object, grouped by its concrete class and stable ID.
+     */
+    public readonly logger: Logger
+
     /**
      * The ID of this game object.
      */
@@ -85,6 +91,7 @@ export class GameObject {
         }
 
         this.id = opts.id
+        this.logger = new Logger(this.constructor.name, String(this.id))
 
         this.threeObject = new Group()
         this.threeObject.name = `GameObject:${this.id}`
@@ -101,7 +108,7 @@ export class GameObject {
         this._visible = opts?.visible ?? true
         this._objectAntics = this._parseAntics(opts?.antics)
 
-        console.log(`[GameObject::constructor] Constructed ${this.constructor.name} ${this.name} with id ${this.id} and authority ${this.hasAuthority}`)
+        this.logger.log(`Constructed ${this.constructor.name} ${this.name} with id ${this.id} and authority ${this.hasAuthority}`)
     }
 
     /**
@@ -214,6 +221,7 @@ export class GameObject {
     private _setupMiniAntics() : void {
         this._environment = this.game.makeChildEnvironment()
         this._environment.set("self", this)
+        this._environment.set("print", (message: string) => this.logger.log(`MiniAntics: ${message}`))
         this._environment.set("invoke-rpc", (name: string) => {
             return this._beginMiniAnticsRpcCall(name)
         })

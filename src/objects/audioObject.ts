@@ -63,7 +63,7 @@ export class AudioObject extends AssetLoading(GameObject) {
     onGameSet(): void {
         const listener = this.game.audioListener?.listener
         if (listener === undefined) {
-            console.warn(`[AudioObject::onGameSet] No audio listener!`)
+            this.logger.warn(`No audio listener!`)
             return
         }
 

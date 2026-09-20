@@ -104,7 +104,7 @@ export class BackgroundEnvironmentObject extends AssetLoading(GameObject) {
                 break
 
             default:
-                console.warn(`[BackgroundEnvironmentObject:_loadBackground] Background type ${this.type} is not supported yet.`)
+                this.logger.warn(`Background type ${this.type} is not supported yet.`)
                 break
 
         }
@@ -119,7 +119,6 @@ export class BackgroundEnvironmentObject extends AssetLoading(GameObject) {
 
         // Try to match the asset references from within the CSS.
         const matches = [...css.matchAll(assetRegex)]
-        console.log(matches)
         if (matches.length > 0) {
             for (const match of matches) {
                 let url = decodeURIComponent(match[0])
@@ -152,11 +151,11 @@ export class BackgroundEnvironmentObject extends AssetLoading(GameObject) {
             this.skyboxNegY === undefined ||
             this.skyboxNegZ === undefined
         ) {
-            console.warn(`[BackgroundEnvironmentObject::_buildSkybox] Skybox incomplete.`)
+            this.logger.warn(`Skybox entity is missing parts!`)
             return Promise.resolve(undefined)
         }
 
-        console.log('loading assets')
+        this.logger.log('Loading skybox textures...')
         return loader.loadAsync([this.skyboxPosX, this.skyboxNegX, this.skyboxPosY, this.skyboxNegY, this.skyboxPosZ, this.skyboxNegZ])
     }
 }

@@ -1,3 +1,4 @@
+import { Logger } from "../logging"
 import { AudioLoader, Group, LoadingManager } from "three"
 import { FBXLoader, MTLLoader, OBJLoader } from "three/examples/jsm/Addons.js"
 import { disposeTree } from "../helpers/disposeTree"
@@ -47,6 +48,8 @@ export type AssetContext<T> = {
  * The class responsible for deduplicating loaded assets.
  */
 export class AssetManager {
+    private readonly _logger = new Logger('Data', 'AssetManager')
+
     /**
      * The list of registered handlers.
      */
@@ -131,12 +134,12 @@ export class AssetManager {
         if (this._loads.has(path)) {
             pending = this._loads.get(path)!
 
-            console.info(`[AssetManager::load] Cache hit for ${path}`)
+            this._logger.log(`Cache hit for ${path}`)
         } else {
             pending = handler.loader(path, { loader: this._loader })
 
             this._loads.set(path, pending)
-            console.warn(`[AssetManager::load] Cache miss for ${path}`)
+            this._logger.warn(`Cache miss for ${path}`)
         }
 
         const value = await pending
@@ -161,7 +164,7 @@ export class AssetManager {
             })
         }
 
-        console.info(`[AssetManager::clear] Disposed ${this._loads.size} cached assets.`)
+        this._logger.log(`Disposed ${this._loads.size} cached assets.`)
         this._loads.clear()
     }
 

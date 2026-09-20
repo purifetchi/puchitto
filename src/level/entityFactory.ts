@@ -1,3 +1,4 @@
+import { Logger } from "../logging"
 import { Game } from "../game";
 import type { CreateEntityPacket } from "../networking/packets/internal/createEntityPacket";
 import { BackgroundEnvironmentObject, CameraObject } from "../objects";
@@ -43,6 +44,8 @@ interface EntityDefintionForCreation {
  * The entity factory responsible for creating entities.
  */
 export class EntityFactory {
+    private readonly _logger = new Logger('Level', 'EntityFactory')
+
     /**
      * The currently active game.
      */
@@ -132,7 +135,7 @@ export class EntityFactory {
                 return maybeUnknownEntity as T
             }
 
-            console.error(`[EntityFactory::createFromLevelDefinition] Could not find create function for entity type ${type}.`)
+            this._logger.error(`Could not find create function for entity type ${type}.`)
             return
         }
 
@@ -170,7 +173,7 @@ export class EntityFactory {
                 return maybeUnknownEntity
             }
 
-            console.error(`[EntityFactory::createFromLevelDefinition] Could not find create function for entity type ${ent.type}.`)
+            this._logger.error(`Could not find create function for entity type ${ent.type}.`)
             return
         }
 
@@ -201,7 +204,7 @@ export class EntityFactory {
                 return maybeUnknownEntity
             }
 
-            console.error(`[EntityFactory::createFromLevelDefinition] Could not find create function for entity type ${packet.entityName}.`)
+            this._logger.error(`Could not find create function for entity type ${packet.entityName}.`)
             return
         }
 

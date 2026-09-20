@@ -1,6 +1,9 @@
+import { Logger } from "../logging"
 import type { AnimationAction, AnimationClip, AnimationMixer } from "three";
 
 export class AnimatorComponent {
+    private readonly _logger = new Logger('Components', 'AnimatorComponent')
+
     /**
      * The main animation mixer.
      */
@@ -46,7 +49,7 @@ export class AnimatorComponent {
         const clip = this._clips[name]
 
         if (clip === undefined) {
-            console.error(`[AnimatorComponent::play] Could not find a clip of name ${name}!`)
+            this._logger.error(`Could not find a clip of name ${name}!`)
             return
         }
 
@@ -72,7 +75,7 @@ export class AnimatorComponent {
      */
     stop() : void {
         if (this._currentClip === undefined) {
-            console.error(`[AnimatorComponent::stop] No clip playing!`)
+            this._logger.error(`No clip playing!`)
             return
         }
 

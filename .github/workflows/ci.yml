@@ -1,0 +1,40 @@
+name: Build puchitto
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run typecheck
+      - run: npm run build
+
+      - name: Verify every export resolves
+        run: |
+          node -e '
+            const fs = require("fs");
+            const { exports } = require("./package.json");
+            const missing = Object.values(exports)
+              .flatMap((e) => Object.values(e))
+              .filter((p) => !fs.existsSync(p));
+            if (missing.length) {
+              console.error("missing build output:\n" + missing.join("\n"));
+              process.exit(1);
+            }
+            console.log("all export targets present");
+          '
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: dist
+          path: dist
+          if-no-files-found: error

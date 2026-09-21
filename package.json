@@ -69,10 +69,11 @@
         "typecheck": "tsc --noEmit --skipLibCheck"
     },
     "devDependencies": {
+        "@mary/events": "npm:@jsr/mary__events@^0.2.0",
         "@types/three": "^0.183.1",
         "three": "^0.183.2",
         "tsup": "^8.5.1",
-        "@mary/events": "npm:@jsr/mary__events@^0.2.0"
+        "typescript": "^5.9.3"
     },
     "peerDependencies": {
         "@mary/events": "npm:@jsr/mary__events@^0.2.0",

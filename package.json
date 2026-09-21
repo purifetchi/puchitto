@@ -2,6 +2,10 @@
     "name": "puchitto",
     "version": "0.1.0",
     "type": "module",
+    "description": "A framework for making multiplayer 3d experiences.",
+    "keywords": ["threejs", "3d", "multiplayer", "game"],
+    "homepage": "https://github.com/shinolabs/puchitto",
+    "license": "MIT",
     "main": "./dist/index.js",
     "types": "./dist/index.d.ts",
     "exports": {

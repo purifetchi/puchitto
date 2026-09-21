@@ -87,7 +87,7 @@ export class WebSocketListener implements NetworkListener {
      * @param data The data.
      */
     sendRaw(data: Uint8Array) {
-        this._webSocket?.send(data)
+        this._webSocket?.send(data as BufferSource)
     }
 
     /**

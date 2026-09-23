@@ -19,6 +19,22 @@ jobs:
           registry-url: https://registry.npmjs.org
       - run: npm ci
 
+      - name: Verify package contents
+        run: |
+          npm run build
+          npm pack --dry-run --json --ignore-scripts > package-contents.json
+          node -e '
+            const files = JSON.parse(require("fs").readFileSync("package-contents.json", "utf8"))[0].files;
+            const paths = new Set(files.map(({ path }) => path));
+            const required = ["dist/index.js", "dist/index.d.ts"];
+            const missing = required.filter((path) => !paths.has(path));
+            if (missing.length) {
+              console.error("missing package output:\n" + missing.join("\n"));
+              process.exit(1);
+            }
+            console.log("package contains runtime and type entry points");
+          '
+
       - name: Verify tag matches package version
         run: |
           PKG_VERSION=$(node -p "require('./package.json').version")

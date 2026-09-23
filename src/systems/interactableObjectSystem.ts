@@ -1,4 +1,5 @@
-import { EffectComposer, OutlinePass } from "three/examples/jsm/Addons.js";
+import { EffectComposer } from "three/examples/jsm/postprocessing/EffectComposer.js";
+import { OutlinePass } from "three/examples/jsm/postprocessing/OutlinePass.js";
 import { Game, Input, MOUSE_LEFT } from "..";
 import { GameSystem } from "./gameSystem";
 

@@ -1,6 +1,8 @@
 import { Logger } from "../logging"
 import { AudioLoader, Group, LoadingManager } from "three"
-import { FBXLoader, MTLLoader, OBJLoader } from "three/examples/jsm/Addons.js"
+import { FBXLoader } from "three/examples/jsm/loaders/FBXLoader.js"
+import { MTLLoader } from "three/examples/jsm/loaders/MTLLoader.js"
+import { OBJLoader } from "three/examples/jsm/loaders/OBJLoader.js"
 import { disposeTree } from "../helpers/disposeTree"
 
 /**

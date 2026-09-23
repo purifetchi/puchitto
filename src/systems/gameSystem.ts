@@ -1,4 +1,4 @@
-import { EffectComposer } from "three/examples/jsm/Addons.js"
+import { EffectComposer } from "three/examples/jsm/postprocessing/EffectComposer.js"
 import { Game } from ".."
 
 /**

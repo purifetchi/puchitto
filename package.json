@@ -1,6 +1,6 @@
 {
     "name": "puchitto",
-    "version": "0.1.1",
+    "version": "0.1.2",
     "type": "module",
     "description": "A framework for making multiplayer 3d experiences.",
     "keywords": ["threejs", "3d", "multiplayer", "game"],

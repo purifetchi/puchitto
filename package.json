@@ -6,6 +6,10 @@
     "keywords": ["threejs", "3d", "multiplayer", "game"],
     "homepage": "https://github.com/shinolabs/puchitto",
     "license": "MIT",
+    "repository": {
+       "type": "git",
+       "url": "git+https://github.com/shinolabs/puchitto.git"
+    },
     "main": "./dist/index.js",
     "types": "./dist/index.d.ts",
     "exports": {

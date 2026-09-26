@@ -116,6 +116,13 @@ export class NetworkManager {
     }
 
     /**
+     * Stops listening.
+     */
+    stop() {
+        this._listener.close()
+    }
+
+    /**
      * Rents a network writer.
      * @returns The network writer.
      */

@@ -66,6 +66,13 @@ export class Input {
     }
 
     /**
+     * Disposes all the events held by the input.
+     */
+    dispose() {
+
+    }
+
+    /**
      * Sets whether the input should be enabled.
      * @param enabled Whether input is enabled.
      */

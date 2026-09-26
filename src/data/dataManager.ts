@@ -44,7 +44,7 @@ export class DataManager {
     async loadPackage(path: string) {
         // TODO: We should not dispose all packages every time we do this.
         //       Should packages have some sort of tag, so for example we only dispose scene ones?
-        this._disposeProviders()
+        this.disposeProviders()
 
         this._logger.log(`Loading ${path}...`)
 
@@ -57,7 +57,7 @@ export class DataManager {
      * @param buffer The buffer.
      */
     async loadPackageFromBuffer(buffer: ArrayBufferLike) {
-        this._disposeProviders()
+        this.disposeProviders()
 
         const alfPackage = new AlfPackage(buffer, "")
         this.addProvider(new AlfProvider(alfPackage))
@@ -77,7 +77,7 @@ export class DataManager {
     /**
      * Disposes the providers.
      */
-    private _disposeProviders() {
+    disposeProviders() {
         for (const provider of this._providers) {
             provider.dispose()
         }

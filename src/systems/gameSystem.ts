@@ -22,4 +22,9 @@ export interface GameSystem {
      * @param dt The delta time since the last frame.
      */
     tick: (dt: number) => void
+
+    /**
+     * Disposes this game system.
+     */
+    dispose?: () => void
 }

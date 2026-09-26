@@ -161,6 +161,11 @@ export abstract class Game {
     private _realmUrl?: string
 
     /**
+     * Is this instance disposed.
+     */
+    private _isDisposed: boolean = false
+
+    /**
      * An event stream for objects to subscribe to.
      */
     eventStream = new events.EventEmitter<{
@@ -199,6 +204,10 @@ export abstract class Game {
         server: string,
         listenerFactory?: (url: string) => NetworkListener
     }) {
+        if (this._isDisposed) {
+            throw new Error("Cannot run a disposed game instance.")
+        }
+
         const { element, server, listenerFactory } = opts
 
         this._parentElement = element
@@ -219,18 +228,7 @@ export abstract class Game {
      * Creates a blank scene.
      */
     createScene() : void {
-        if (this._objects.length > 0) {
-            for (const obj of this._objects) {
-                this._scene.remove(obj.threeObject)
-                obj.destroy()
-            }
-        }
-
-        this._assetManager.clear()
-
-        this._objects = []
-        this._objectIdMap.clear()
-        this._lastInternalId = 0
+        this._teardownScene()
 
         this._scene = new THREE.Scene()
         this._camera = this.createDefaultCamera()
@@ -242,6 +240,25 @@ export abstract class Game {
         }
 
         this.eventStream.emit('sceneCreated')
+    }
+
+    /**
+     * Tears down the old scene.
+     */
+    private _teardownScene(): void {
+        if (this._objects.length > 0) {
+            for (const obj of this._objects) {
+                this._scene.remove(obj.threeObject)
+                this.eventStream.emit("objectRemoved", obj)
+                obj.destroy()
+            }
+        }
+
+        this._assetManager.clear()
+
+        this._objects = []
+        this._objectIdMap.clear()
+        this._lastInternalId = 0
     }
 
     /**
@@ -835,5 +852,41 @@ export abstract class Game {
         this._composer?.render(dt)
         this._css3D.render(this._scene, this._camera.camera)
         this._input.reset()
+    }
+
+    /**
+     * Disposes this puchitto instance.
+     */
+    dispose() {
+        if (this._isDisposed) {
+            return
+        }
+
+        // Tear down the scene.
+        this._teardownScene()
+
+        // Begin stopping the subsystems.
+        this._networkManager.stop()
+        this._tweens = []
+
+        for (const system of this._gameSystems) {
+            system.dispose?.()
+        }
+
+        this._resizeObserver.disconnect()
+
+        this._composer?.dispose()
+        this._renderer.setAnimationLoop(null)
+        this._renderer.dispose()
+
+        this._input.dispose()
+
+        // Remove the associated elements.
+        this._css3D.domElement.remove()
+        this._renderer.domElement.remove()
+
+        this._dataManager.disposeProviders()
+
+        this._isDisposed = true
     }
 }

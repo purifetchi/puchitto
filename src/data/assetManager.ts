@@ -1,9 +1,10 @@
 import { Logger } from "../logging"
-import { AudioLoader, Group, LoadingManager } from "three"
+import { AudioLoader, Group, LoadingManager, Material } from "three"
 import { FBXLoader } from "three/examples/jsm/loaders/FBXLoader.js"
 import { MTLLoader } from "three/examples/jsm/loaders/MTLLoader.js"
 import { OBJLoader } from "three/examples/jsm/loaders/OBJLoader.js"
 import { disposeTree } from "../helpers/disposeTree"
+import { MaterialLoader } from "../rendering"
 
 /**
  * A single asset definition.
@@ -108,6 +109,20 @@ export class AssetManager {
             loader: async (path, { loader }) => {
                 const obj = new AudioLoader(loader)
                 return obj.loadAsync(path)
+            }
+        })
+
+        this.register<Material>({
+            extensions: ["pmat"],
+            loader: async (path, { loader }) => {
+                const ldr = new MaterialLoader(loader, this)
+                return ldr.loadAsync(path)
+            },
+            instantiate: (asset) => {
+                return asset.clone()
+            },
+            destroy: (asset) => {
+                asset.dispose()
             }
         })
     }

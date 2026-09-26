@@ -1,6 +1,7 @@
-import { DoubleSide, FrontSide, LoadingManager, Material, MeshBasicMaterial, MeshPhongMaterial, MeshToonMaterial, ShaderMaterial } from "three";
+import { DoubleSide, FrontSide, LoadingManager, Material, MeshBasicMaterial, MeshPhongMaterial, MeshToonMaterial, ShaderMaterial, Texture } from "three";
 import { AssetManager } from "../data/assetManager";
 import { MaterialShader, MaterialVariable, PuchittoMaterialDefinition } from "./data/puchittoMaterialDefinition";
+import { Logger } from "../logging";
 
 /**
  * Loader for puchitto's material format.
@@ -15,6 +16,11 @@ export class MaterialLoader {
      * The THREE.js loading manager.
      */
     private _loader: LoadingManager
+
+    /**
+     * The logger for this material loader.
+     */
+    private _logger: Logger = new Logger("Data", "MaterialLoader")
 
     constructor(loader: LoadingManager, assetManager: AssetManager) {
         this._assetManager = assetManager
@@ -39,7 +45,7 @@ export class MaterialLoader {
         base.side = def.doubleSided ? DoubleSide : FrontSide
 
         for (const matVar of def.variables) {
-            this._setVariableForMaterial(base, matVar)
+            await this._setVariableForMaterial(base, matVar)
         }
 
         base.needsUpdate = true
@@ -52,12 +58,27 @@ export class MaterialLoader {
      * @param mat The material.
      * @param variable The variable to set.
      */
-    private _setVariableForMaterial(mat: Material, variable: MaterialVariable) {
-        const key = variable.name as keyof Material
+    private async _setVariableForMaterial(mat: Material, variable: MaterialVariable): Promise<void> {
+        if (!(variable.name in mat)) {
+            this._logger.warn(`Property ${variable.name} doesn't exist on shader.`)
+            return
+        }
+
+        const writableMat = mat as unknown as Record<string, unknown>
+        const key = variable.name
 
         switch (variable.type) {
             case "float":
-                mat[key] = variable.name
+            case "vec2":
+            case "vec3":
+            case "bool":
+            case "color":
+                writableMat[key] = variable.value
+                return
+
+            case "texture":
+                const tex = await this._assetManager.load<Texture>(variable.value)
+                writableMat[key] = tex
                 return
         }
     }

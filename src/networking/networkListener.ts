@@ -30,6 +30,11 @@ export interface NetworkListener {
     listen: () => void
 
     /**
+     * Closes the connection.
+     */
+    close: () => void
+
+    /**
      * Sends raw data.
      * @param data The data.
      */

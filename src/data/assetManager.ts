@@ -1,5 +1,5 @@
 import { Logger } from "../logging"
-import { AudioLoader, Group, LoadingManager, Material } from "three"
+import { AudioLoader, Group, LoadingManager, Material, Texture, TextureLoader } from "three"
 import { FBXLoader } from "three/examples/jsm/loaders/FBXLoader.js"
 import { MTLLoader } from "three/examples/jsm/loaders/MTLLoader.js"
 import { OBJLoader } from "three/examples/jsm/loaders/OBJLoader.js"
@@ -123,6 +123,14 @@ export class AssetManager {
             },
             destroy: (asset) => {
                 asset.dispose()
+            }
+        })
+
+        this.register<Texture>({
+            extensions: ["jpg", "jpeg", "png", "gif", "bmp"],
+            loader: async (path, { loader }) => {
+                const ldr = new TextureLoader(loader)
+                return ldr.loadAsync(path)
             }
         })
     }
